@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kolkata Puja Pandals - Durga & Kali Puja Locations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #8B0000, #DC143C, #FF6347);
+            min-height: 100vh;
+            color: #333;
+            padding-bottom: 60px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            color: #8B0000;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(45deg, #8B0000, #DC143C, #FF6347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .decorative-border {
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            margin: 20px auto;
+            border-radius: 2px;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 14px 20px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .search-input:focus {
+            border-color: #FF6347;
+            box-shadow: 0 0 10px rgba(255, 99, 71, 0.3);
+        }
+
+        .search-btn, .map-toggle, .puja-toggle {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn {
+            background: linear-gradient(45deg, #FF6347, #FF4500);
+            color: white;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 99, 71, 0.4);
+        }
+
+        .map-toggle {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .map-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .puja-toggle {
+            background: linear-gradient(45deg, #f23303, #fd0101);
+            color: white;
+        }
+
+        .puja-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(250, 2, 2, 0.4);
+        }
+
+        .puja-toggle a {
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Map Container */
+        .map-container {
+            display: none;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            height: 450px;
+            position: relative;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Pandal Grid */
+        .pandal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .pandal-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            opacity: 1;
+        }
+
+        .pandal-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+        }
+
+        .pandal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            border-color: #FF6347;
+        }
+
+        .pandal-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #8B0000;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pandal-address {
+            color: #666;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.5;
+        }
+
+        .pandal-timing {
+            color: #28a745;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pandal-description {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .pandal-category {
+            color: #8B0000;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding: 6px 12px;
+            background: rgba(139, 0, 0, 0.1);
+            border-radius: 10px;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .crowd-level {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .crowd-very-high {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .crowd-extremely-high {
+            background: linear-gradient(45deg, #8B0000, #A0002A);
+            color: white;
+        }
+
+        .crowd-high {
+            background: linear-gradient(45deg, #fd7e14, #e8590c);
+            color: white;
+        }
+
+        .crowd-moderate {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .key-info {
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2196f3;
+            color: #1565c0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .pandal-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-map {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .btn-map:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .btn-google-map {
+            background:red;
+            color: white;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .btn-google-map:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.4);
+        }
+
+        .special-feature {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #8B0000;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-top: 10px;
+            display: inline-block;
+            border: 1px solid #FFA500;
+        }
+
+        /* Tips Section */
+        .tips-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .tips-section h2 {
+            color: #8B0000;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .tips-section h2::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 2px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.1));
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid #FF6347;
+            transition: all 0.3s ease;
+        }
+
+        .tip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
+        }
+
+        .tip-card h3 {
+            color: #8B0000;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tip-card p {
+            color: #444;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .footer p {
+            margin: 8px 0;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #fff;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .no-results h3 {
+            color: #8B0000;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .no-results p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: 100%;
+            }
+            
+            .pandal-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .map-container {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .pandal-name {
+                font-size: 1.4rem;
+            }
+            
+            .search-btn, .map-toggle {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+            
+            .map-container {
+                height: 300px;
+            }
+        }
+
+        /* Festive animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Map marker styles */
+        .leaflet-popup-content {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .leaflet-popup-content h4 {
+            margin-bottom: 8px;
+            color: #8B0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header floating">
+            <h1>🕉️ Pujor Morsum 🕉️</h1>
+            <div class="decorative-border"></div>
+            <p>Discover the most famous Durga Puja pandals across Kolkata</p>
+            <p><em>Experience the divine festivities and cultural heritage</em></p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search pandals by name, area, or description...">
+                <button onclick="searchPandals()" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <button onclick="toggleMap()" class="map-toggle" id="mapToggleBtn">
+                    <i class="fas fa-map-marked-alt"></i> Show Map
+                </button>
+                <button class="puja-toggle">
+                     <a href="webp2-3.html">Kali Puja View</a>
+                </button>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-container" id="mapContainer">
+            <div id="map"></div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading pandals...</p>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <h3><i class="fas fa-exclamation-circle"></i> No pandals found</h3>
+            <p>Try searching with different keywords or check back later for more pandals.</p>
+        </div>
+
+        <!-- Pandal Grid -->
+        <div class="pandal-grid" id="pandalGrid"></div>
+
+        <!-- Visitor Tips Section -->
+        <div class="tips-section">
+            <h2>🎯 Tips for Visiting Durga Puja Pandals</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h3><i class="fas fa-clock"></i> Best Timing</h3>
+                    <p>The best nights to visit are on <strong>Durga Puja evening</strong> (the main night) and <strong>Bhai Dooj</strong> (the following night). The crowds are largest between <strong>9:00 PM and 1:00 AM</strong>.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-subway"></i> Transport</h3>
+                    <p>Avoid private cars as roads are blocked. The <strong>Kolkata Metro</strong> is the best way to travel. Use app-based taxis or autos for last-mile connectivity.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-lock"></i> Safety</h3>
+                    <p>Keep your valuables secure in crowded places. Carry minimal cash and avoid wearing expensive jewelry during visits.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-map-marker-alt"></i> Local Guides</h3>
+                    <p>Don't hesitate to ask locals for directions. Kolkatans are very helpful during the puja season and love sharing their cultural knowledge.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-mobile-alt"></i> Stay Connected</h3>
+                    <p>Keep your phone charged and share your location with family. Download offline maps in case of network congestion.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-utensils"></i> Food & Water</h3>
+                    <p>Stay hydrated and try traditional Bengali sweets available at pandals. Street food is abundant but choose clean vendors.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2025 Durga Puja Location | Celebrating the divine spirit of Maa Durga </p>
+            <p>🙏 May Maa Durga bless us all 🙏</p>
+            <p>Developed by Biltu Kundu</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script>
+        // Updated Durga Puja Pandals Data
+        const durgaPandalData = [
+    {
+        id: 1,
+        name: "Sreebhumi Sporting Club",
+        address: "HCX3+H53, Canal St, near P.S, Sreebhumi, Lake Town, South Dumdum, West Bengal 700048",
+        timing: "6:00 AM - 12:00 AM",
+        description: "Known for grand thematic designs like the Mahishmati Palace from Baahubali. This pandal features a massive structure that recreates the iconic palace from the film series, creating an immersive experience for visitors.",
+        latitude: 22.6101,
+        longitude: 88.4102,
+        specialFeature: "Mahishmati Palace Theme",
+        area: "Lake Town",
+        keyInfo: "Massive thematic design inspired by Baahubali film series",
+        crowdLevel: "Very High",
+        category: "Thematic Celebration"
+    },
+    {
+        id: 2,
+        name: "Santosh Mitra Square (Shobhabazar)",
+        address: "Natabar Dutta Row, Lebutala, Bowbazar, Kolkata, West Bengal 700014",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Operation Sindoor – a tribute to the Indian armed forces. This pandal pays homage to the bravery and sacrifice of Indian soldiers with a powerful theme that combines military symbolism with traditional aesthetics.",
+        latitude: 22.5677,
+        longitude: 88.3639,
+        specialFeature: "Tribute to Armed Forces",
+        area: "Shobhabazar",
+        keyInfo: "Powerful theme honoring Indian armed forces",
+        crowdLevel: "High",
+        category: "Social & Patriotic"
+    },
+    {
+        id: 3,
+        name: "Chetla Agrani Club",
+        address: "14, Peary Mohan Roy Rd, Chetla, Kolkata, West Bengal 700027",
+        timing: "6:00 AM - 11:00 PM",
+        description: "Amrito Kumbher Sondhane – built with over three crore rudraksha beads. This pandal is a remarkable feat of craftsmanship, featuring a massive structure adorned with millions of rudraksha beads, symbolizing spiritual purity and devotion.",
+        latitude: 22.5221,
+        longitude: 88.3372,
+        specialFeature: "Three Crore Rudraksha Beads",
+        area: "Chetla",
+        keyInfo: "Massive structure made with over three crore rudraksha beads",
+        crowdLevel: "High",
+        category: "Spiritual Artistry"
+    },
+    {
+        id: 4,
+        name: "Dum Dum Park Tarun Sangha",
+        address: "225/1, Dum Dum Park, South Dumdum, West Bengal 700055",
+        timing: "6:00 AM - 11:00 PM",
+        description: "Satyanneshi – inspired by Bengali detective Byomkesh Bakshi. This pandal features a thematic design centered around the famous detective character, incorporating mystery elements and classic Bengali detective storytelling.",
+        latitude: 22.6102,
+        longitude: 88.4196,
+        specialFeature: "Byomkesh Bakshi Theme",
+        area: "Dum Dum Park",
+        keyInfo: "Thematic celebration inspired by Bengali detective Byomkesh Bakshi",
+        crowdLevel: "High",
+        category: "Literary & Cultural"
+    },
+    {
+        id: 5,
+        name: "Ahiritola Sarbojanin",
+        address: "12/4, Ahiritola, Beniatola, Kolkata, West Bengal 700005",
+        timing: "6:00 AM - 11:00 PM",
+        description: "Blends traditional aesthetics with contemporary themes. This pandal successfully integrates age-old Bengali traditions with modern artistic expressions, creating a unique fusion that appeals to both traditionalists and modern audiences.",
+        latitude: 22.5947,
+        longitude: 88.3632,
+        specialFeature: "Traditional with Contemporary Twist",
+        area: "Ahiritola",
+        keyInfo: "Fusion of traditional and contemporary themes",
+        crowdLevel: "High",
+        category: "Cultural Fusion"
+    },
+    {
+        id: 6,
+        name: "Bagbazar Sarbojanin",
+        address: "78, Bagbazar St, Baghbazar, Kolkata, West Bengal 700003",
+        timing: "6:00 AM - 11:30 PM",
+        description: "One of the oldest pandals, established in 1919, known for traditional themes. With a rich history spanning over a century, this pandal maintains authentic Bengali rituals and traditional celebrations that have been passed down through generations.",
+        latitude: 22.6061,
+        longitude: 88.3647,
+        specialFeature: "Oldest Pandal (1919)",
+        area: "Bagbazar",
+        keyInfo: "One of Kolkata's oldest community pujas since 1919",
+        crowdLevel: "Very High",
+        category: "Historic Heritage"
+    },
+    {
+        id: 7,
+        name: "Mohammad Ali Park Durga Puja",
+        address: "H9G6+V7H, Chittaranjan Ave, Calcutta University, College Square, Kolkata, West Bengal 700073",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Features replicas of famous monuments and intricate decorations. This pandal showcases miniature replicas of iconic landmarks from around the world, blending global architecture with traditional Bengali aesthetics.",
+        latitude: 22.5832,
+        longitude: 88.3639,
+        specialFeature: "Global Monument Replicas",
+        area: "College Square",
+        keyInfo: "Replicas of famous monuments from around the world",
+        crowdLevel: "High",
+        category: "Global Themes"
+    },
+    {
+        id: 8,
+        name: "Tridhara Sammilani",
+        address: "107, Manoharpukur, Kalighat, Kolkata, West Bengal 700029",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its artistic themes and cultural presentations. This pandal consistently delivers high-quality artistic displays with sophisticated themes that reflect contemporary social issues and cultural narratives.",
+        latitude: 22.5196,
+        longitude: 88.3497,
+        specialFeature: "Artistic Presentations",
+        area: "Manoharpukur Road",
+        keyInfo: "Sophisticated artistic themes and cultural programs",
+        crowdLevel: "High",
+        category: "Artistic Excellence"
+    },
+    {
+        id: 9,
+        name: "Singhi Park",
+        address: "Dover Terrace, Ballygunge, Kolkata, West Bengal 700029",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its traditional themes and artistic presentations. This pandal maintains a strong connection to traditional Bengali culture while delivering visually stunning artistic displays.",
+        latitude: 22.5252,
+        longitude: 88.3536,
+        specialFeature: "Traditional Artistry",
+        area: "Gariahat",
+        keyInfo: "Classic traditional themes with artistic excellence",
+        crowdLevel: "High",
+        category: "Traditional Art"
+    },
+    {
+        id: 10,
+        name: "Hindustan Park",
+        address: "Golpark, Hindustan Park, Gariahat, Kolkata, West Bengal",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Features creative themes and community involvement. This pandal blends artistic innovation with strong community participation, creating a balanced celebration that honors tradition while embracing new ideas.",
+        latitude: 22.5167,
+        longitude: 88.3641,
+        specialFeature: "Creative Community Involvement",
+        area: "South Kolkata",
+        keyInfo: "Balanced blend of creativity and community participation",
+        crowdLevel: "High",
+        category: "Community Art"
+    },
+    {
+        id: 11,
+        name: "Ballygunge Cultural Association",
+        address: "20, Lake View Rd, lake Terrace, Kalighat, Kolkata, West Bengal 700029",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its cultural presentations and community participation. This pandal is renowned for its elaborate cultural programs that showcase various aspects of Bengali heritage and traditions.",
+        latitude: 22.5172,
+        longitude: 88.3536,
+        specialFeature: "Cultural Programs",
+        area: "Ballygunge",
+        keyInfo: "Elaborate cultural programs showcasing Bengali heritage",
+        crowdLevel: "High",
+        category: "Cultural Showcase"
+    },
+    {
+        id: 12,
+        name: "Bhowanipur 75 Palli",
+        address: "Shop 13, Road, Bhowanipore, Kolkata, West Bengal 700025",
+        timing: "6:00 AM - 11:30 PM",
+        description: "A tribute to Nati Binodini, a pioneering figure in Bengali theatre. The pandal showcases intricate artwork and storytelling inspired by her journey as an actress and trailblazer in the 19th century, highlighting her significant contributions to Bengali culture.",
+        latitude: 22.5271,
+        longitude: 88.3406,
+        specialFeature: "Nati Binodini Tribute",
+        area: "Bhowanipur",
+        keyInfo: "Celebration of pioneer Bengali theatre artist Nati Binodini",
+        crowdLevel: "High",
+        category: "Cultural Tribute"
+    },
+    {
+        id: 21,
+        name: "Beliaghata 33 Palli",
+        address: "z, 94, Hem Chandra Naskar Rd, Subhas Sarobar Park, Phool Bagan, Beleghata, Kolkata, West Bengal 700010",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Tin Tin, Sarta Tin – focusing on the essentials of life: food, clothing, and shelter. Designed by Shibsankar Das, this pandal is known for its art and symbolism, representing fundamental human needs through creative visual metaphors.",
+        latitude: 22.5732,
+        longitude: 88.3892,
+        specialFeature: "Essentials of Life Theme",
+        area: "Beliaghata",
+        keyInfo: "Symbolic representation of food, clothing, and shelter",
+        crowdLevel: "High",
+        category: "Artistic Symbolism"
+    },
+    {
+        id: 22,
+        name: "Chaltabagan Sarbojanin",
+        address: "122, Vivekananda Rd, Simla, Machuabazar, Kolkata, West Bengal 700006",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its creative and innovative themes, this pandal is a must-visit for those exploring Central Kolkata. The pandal consistently delivers fresh, imaginative concepts that push the boundaries of traditional puja celebrations.",
+        latitude: 22.5891,
+        longitude: 88.3687,
+        specialFeature: "Innovative Themes",
+        area: "Chaltabagan",
+        keyInfo: "Creative and imaginative themes for Central Kolkata",
+        crowdLevel: "High",
+        category: "Innovation"
+    },
+    {
+        id: 25,
+        name: "Behala Club Sarbojanin Durgotsav",
+        address: "No. 57, Banamali Naskar Rd, Panchanan Tala, Behala, Kolkata, West Bengal 700060",
+        timing: "6:00 AM - 11:30 PM",
+        description: "A community-centric celebration reflecting the cultural vibrancy of the region. This pandal brings together residents from across Behala to celebrate with shared traditions and collective joy.",
+        latitude: 22.4952,
+        longitude: 88.3171,
+        specialFeature: "Community-Centric",
+        area: "Behala",
+        keyInfo: "Celebration reflecting regional cultural vibrancy",
+        crowdLevel: "High",
+        category: "Community Celebration"
+    },
+    {
+        id: 27,
+        name: "Santoshpur Lake Pally Durgotsav",
+        address: "F9RM+H4J, Lake W Rd, Lake Terrace, Santoshpur, Kolkata, West Bengal 700075",
+        timing: "6:00 AM - 11:30 PM",
+        description: "A community-driven celebration with a focus on traditional rituals and modern themes. This pandal successfully balances time-honored traditions with contemporary interpretations, creating a meaningful celebration for all ages.",
+        latitude: 22.4847,
+        longitude: 88.3892,
+        specialFeature: "Traditional & Modern Blend",
+        area: "Santoshpur",
+        keyInfo: "Balance of traditional rituals and modern themes",
+        crowdLevel: "High",
+        category: "Cultural Balance"
+    },
+    {
+        id: 29,
+        name: "Hindusthan Park Sarbojanin Durgotsav",
+        address: "51/1, Gol Park, Dhakuria, Hindustan Park, Gariahat, Kolkata, West Bengal 700029",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its innovative themes and community participation, this pandal is a favorite among locals. The pandal consistently delivers fresh, creative concepts that engage the community in meaningful ways.",
+        latitude: 22.5167,
+        longitude: 88.3641,
+        specialFeature: "Innovative Themes",
+        area: "Hindusthan Park",
+        keyInfo: "Creative themes with strong community engagement",
+        crowdLevel: "High",
+        category: "Community Innovation"
+    },
+    {
+        id: 30,
+        name: "Ekdalia Evergreen",
+        address: "15, Ekdalia Rd, Ekdalia, Ballygunge, Kolkata, West Bengal 700019",
+        timing: "6:00 AM - 12:00 AM",
+        description: "Known for its massive structures and buzzing crowds, Ekdalia Evergreen is one of the iconic pandals in Kolkata. The pandal is famous for its grand scale and ability to attract massive crowds during the festival season.",
+        latitude: 22.5207,
+        longitude: 88.3552,
+        specialFeature: "Massive Structures",
+        area: "Ekdalia",
+        keyInfo: "Iconic pandal with massive structures and large crowds",
+        crowdLevel: "Extremely High",
+        category: "Iconic Celebration"
+    },
+    {
+        id: 39,
+        name: "Naktala Udayan Sangha",
+        address: "Naktala, Garia, Kolkata, West Bengal 700047",
+        timing: "6:00 AM - 11:30 PM",
+        description: "A blend of traditional and contemporary themes, reflecting the evolving nature of Durga Puja celebrations. This pandal demonstrates how traditional festivals can adapt to changing times while maintaining core values.",
+        latitude: 22.4747,
+        longitude: 88.3702,
+        specialFeature: "Evolution of Traditions",
+        area: "Naktala",
+        keyInfo: "Reflection of evolving nature of Durga Puja celebrations",
+        crowdLevel: "High",
+        category: "Modern Tradition"
+    },
+    {
+        id: 41,
+        name: "Mudiali Club",
+        address: "37, SR Das Rd, Mudiali, Kalighat, Kolkata, West Bengal 700026",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Focuses on creating environment-friendly themes to spread awareness, maintaining the essence of Durga Puja while celebrating in a modern way. This pandal emphasizes sustainability and environmental consciousness in its celebrations.",
+        latitude: 22.5112,
+        longitude: 88.3402,
+        specialFeature: "Eco-Friendly Themes",
+        area: "South Kolkata",
+        keyInfo: "Sustainable celebrations with environmental awareness",
+        crowdLevel: "High",
+        category: "Eco-Conscious"
+    },
+    {
+        id: 42,
+        name: "College Square",
+        address: "H9G6+V7H, Chittaranjan Ave, Calcutta University, College Square, Kolkata, West Bengal 700073",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Renowned for its traditional charm and artistic presentations, making it a must-visit during Durga Puja. The pandal preserves the authenticity of Bengali traditions while delivering impressive artistic displays.",
+        latitude: 22.5832,
+        longitude: 88.3639,
+        specialFeature: "Traditional Charm",
+        area: "Central Kolkata",
+        keyInfo: "Authentic traditional celebration with artistic excellence",
+        crowdLevel: "Very High",
+        category: "Traditional Excellence"
+    },
+    {
+        id: 44,
+        name: "Shobhabazar Rajbari",
+        address: "H9W8+QW4, Raja Nabakrishna Street, Sovabazar, Kolkata, West Bengal 700005",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its royal heritage and traditional rituals, offering a glimpse into the aristocratic past of Kolkata. The pandal reflects the opulence and grandeur of the former royal families of Bengal.",
+        latitude: 22.6036,
+        longitude: 88.3687,
+        specialFeature: "Royal Heritage",
+        area: "North Kolkata",
+        keyInfo: "Glimpse into aristocratic past of Kolkata",
+        crowdLevel: "High",
+        category: "Royal Tradition"
+    },
+    {
+        id: 45,
+        name: "Dum Dum Park Bharat Chakra",
+        address: "Tank No. 2, Dum Dum Park, South Dumdum, West Bengal 700055",
+        timing: "6:00 AM - 12:00 AM",
+        description: "This club has created an impressive 3D pandal called ‘The Aura,’ incorporating futuristic elements and touching upon the theme of spirituality. The pandal features advanced technology and innovative design to create a unique spiritual experience.",
+        latitude: 22.6102,
+        longitude: 88.4196,
+        specialFeature: "3D Futuristic Design",
+        area: "South Dumdum",
+        keyInfo: "Advanced 3D design with futuristic elements",
+        crowdLevel: "Very High",
+        category: "Futuristic Technology"
+    },
+    {
+        id: 46,
+        name: "Sodepur Pansila Thakurbari",
+        address: "Deshbandhu Nagar, Makal Tala, Anandapally, Kolkata, Khardaha, West Bengal 700112",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its unique themes and artistic presentations, this pandal is a favorite among visitors. The pandal consistently delivers distinctive themes that stand out from other celebrations in the city.",
+        latitude: 22.7002,
+        longitude: 88.3772,
+        specialFeature: "Unique Themes",
+        area: "Sodepur",
+        keyInfo: "Distinctive themes and artistic excellence",
+        crowdLevel: "High",
+        category: "Unique Expression"
+    },
+    {
+        id: 51,
+        name: "Nalin Sarkar Street",
+        address: "205-A, Shri Aurobindo Sarani Rd, Hati Bagan, Shyam Bazar, Kolkata, West Bengal 700006",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Nalin Sarkar Street focuses on artistry rooted in local culture, often highlighting rural Bengal, folk crafts, and timeless aesthetics. It's a great stop for those wanting to witness the essence of traditional Durga Puja.",
+        latitude: 22.6012,
+        longitude: 88.3703,
+        specialFeature: "Rural Bengal Artistry",
+        area: "North Kolkata",
+        keyInfo: "Artistry rooted in rural Bengal and folk crafts",
+        crowdLevel: "High",
+        category: "Local Culture"
+    },
+    {
+        id: 53,
+        name: "Kumartuli Park",
+        address: "SARBOJANIN DURGOTSAB COMMITTEE, 8B, Abhay Mitra St, Sovabazar, Kumartuli, Shobhabazar, Kolkata, West Bengal 700005",
+        timing: "6:00 AM - 11:00 PM",
+        description: "Situated near the idol-makers' hub, this pandal is known for bold creativity, pushing boundaries with striking sculptures and avant-garde concepts. The pandal showcases the innovative spirit of Kolkata's artists.",
+        latitude: 22.6067,
+        longitude: 88.3632,
+        specialFeature: "Avant-Garde Creativity",
+        area: "Kumartuli",
+        keyInfo: "Bold creativity and boundary-pushing artistry",
+        crowdLevel: "Moderate",
+        category: "Artistic Innovation"
+    },
+    {
+        id: 54,
+        name: "Tridhara Sammelani",
+        address: "107, Manoharpukur, Kalighat, Kolkata, West Bengal 700029",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Tridhara Sammelani is known for its traditional themes and artistic presentations, making it a must-visit during Durga Puja. The pandal consistently delivers high-quality artistic displays with sophisticated themes.",
+        latitude: 22.5196,
+        longitude: 88.3497,
+        specialFeature: "Traditional Artistry",
+        area: "South Kolkata",
+        keyInfo: "Sophisticated traditional themes and artistic excellence",
+        crowdLevel: "High",
+        category: "Traditional Art"
+    },
+    {
+        id: 56,
+        name: "Alipore Sarbojanin",
+        address: "107, Manoharpukur, Kalighat, Kolkata, West Bengal 700029",
+        timing: "6:00 AM - 11:30 PM",
+        description: "A community-driven celebration with a focus on traditional rituals and modern themes. This pandal successfully blends time-honored practices with contemporary interpretations, creating a meaningful celebration for all ages.",
+        latitude: 22.5196,
+        longitude: 88.3497,
+        specialFeature: "Traditional & Modern Blend",
+        area: "Alipore",
+        keyInfo: "Balance of traditional rituals and modern themes",
+        crowdLevel: "High",
+        category: "Cultural Balance"
+    },
+    {
+        id: 57,
+        name: "Rajdanga Naba Uday Sangha",
+        address: "700039, Rajdanga Chakraborty Para, Sector A, East Kolkata Twp, Kolkata, West Bengal 700107",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its innovative themes and community participation, this pandal is a favorite among locals. The pandal consistently delivers fresh, creative concepts that engage the community in meaningful ways.",
+        latitude: 22.5222,
+        longitude: 88.3956,
+        specialFeature: "Innovative Themes",
+        area: "Rajdanga",
+        keyInfo: "Creative themes with strong community engagement",
+        crowdLevel: "High",
+        category: "Community Innovation"
+    },
+    {
+        id: 60,
+        name: "14 Pally Udayan Sangha",
+        address: "15b, Girish Chandra Bose Rd, Entally, Kolkata, West Bengal 700014",
+        timing: "6:00 AM - 11:30 PM",
+        description: "This pandal is known for its traditional themes and artistic presentations, making it a must-visit during Durga Puja. The pandal preserves the authenticity of Bengali traditions while delivering impressive artistic displays.",
+        latitude: 22.5632,
+        longitude: 88.3732,
+        specialFeature: "Traditional Artistry",
+        area: "Central Kolkata",
+        keyInfo: "Authentic traditional celebration with artistic excellence",
+        crowdLevel: "High",
+        category: "Traditional Art"
+    },
+    {
+        id: 61,
+        name: "37 Pally Sarbojanin Durgotsab",
+        address: "10, Dr Kartik Bose St, College Row, Baithakkhana, Kolkata, West Bengal 700009",
+        timing: "6:00 AM - 11:30 PM",
+        description: "A community-driven celebration with a focus on traditional rituals and modern themes. This pandal successfully blends time-honored practices with contemporary interpretations, creating a meaningful celebration for all ages.",
+        latitude: 22.5732,
+        longitude: 88.3687,
+        specialFeature: "Traditional & Modern Blend",
+        area: "Central Kolkata",
+        keyInfo: "Balance of traditional rituals and modern themes",
+        crowdLevel: "High",
+        category: "Cultural Balance"
+    },
+    {
+        id: 62,
+        name: "47 Pally Jubak Brinda Durga Puja",
+        address: "83, Ahiritola St, Ahiritola, Beniatola, Kolkata, West Bengal 700005",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its innovative themes and community participation, this pandal is a favorite among locals. The pandal consistently delivers fresh, creative concepts that engage the community in meaningful ways.",
+        latitude: 22.5947,
+        longitude: 88.3632,
+        specialFeature: "Innovative Themes",
+        area: "Central Kolkata",
+        keyInfo: "Creative themes with strong community engagement",
+        crowdLevel: "High",
+        category: "Community Innovation"
+    },
+    {
+        id: 63,
+        name: "Central Calcutta Youth Association",
+        address: "40b, Gokul Baral St, JAGANNATH BARI, Bowbazar, Kolkata, West Bengal 700012",
+        timing: "6:00 AM - 11:30 PM",
+        description: "This pandal focuses on creating environment-friendly themes to spread awareness, maintaining the essence of Durga Puja while celebrating in a modern way. The pandal emphasizes sustainability and environmental consciousness in its celebrations.",
+        latitude: 22.5677,
+        longitude: 88.3639,
+        specialFeature: "Eco-Friendly Themes",
+        area: "Central Kolkata",
+        keyInfo: "Sustainable celebrations with environmental awareness",
+        crowdLevel: "High",
+        category: "Eco-Conscious"
+    },
+    {
+        id: 66,
+        name: "Entally Sarbojanin Sri Sri Durga Puja",
+        address: "13, Gope Ln, Entally, Kolkata, West Bengal 700014",
+        timing: "6:00 AM - 11:30 PM",
+        description: "A community-driven celebration with a focus on traditional rituals and modern themes. This pandal successfully blends time-honored practices with contemporary interpretations, creating a meaningful celebration for all ages.",
+        latitude: 22.5632,
+        longitude: 88.3732,
+        specialFeature: "Traditional & Modern Blend",
+        area: "Central Kolkata",
+        keyInfo: "Balance of traditional rituals and modern themes",
+        crowdLevel: "High",
+        category: "Cultural Balance"
+    },
+    {
+        id: 68,
+        name: "21 Pally Sarbojanin Durgotsab Samiti",
+        address: "17, Bondel Rd, near Patha Bhavan, Ballygunge Park, Ballygunge, Kolkata, West Bengal 700019",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its innovative themes and community participation, this pandal is a favorite among locals. The pandal consistently delivers fresh, creative concepts that engage the community in meaningful ways.",
+        latitude: 22.5262,
+        longitude: 88.3632,
+        specialFeature: "Innovative Themes",
+        area: "South Kolkata",
+        keyInfo: "Creative themes with strong community engagement",
+        crowdLevel: "High",
+        category: "Community Innovation"
+    },
+    {
+        id: 70,
+        name: "23 Pally Sarbojanin Durgotsab",
+        address: "27C, Basanta Bose Rd, Jatin Das Park, Patuapara, Bhowanipore, Kolkata, West Bengal 700026",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its traditional charm and artistic presentations, 23 Pally is a must-visit during Durga Puja. The pandal preserves the authenticity of Bengali traditions while delivering impressive artistic displays.",
+        latitude: 22.5232,
+        longitude: 88.3462,
+        specialFeature: "Traditional Charm",
+        area: "South 24 Parganas",
+        keyInfo: "Authentic traditional celebration with artistic excellence",
+        crowdLevel: "High",
+        category: "Traditional Excellence"
+    },
+    {
+        id: 71,
+        name: "25 Pally Durga Puja",
+        address: "G8QG+MHG, Khidirpur, Kolkata, West Bengal 700012",
+        timing: "6:00 AM - 11:30 PM",
+        description: "A blend of traditional and contemporary themes, reflecting the evolving nature of Durga Puja celebrations. This pandal demonstrates how traditional festivals can adapt to changing times while maintaining core values.",
+        latitude: 22.5402,
+        longitude: 88.3252,
+        specialFeature: "Evolution of Traditions",
+        area: "South Kolkata",
+        keyInfo: "Reflection of evolving nature of Durga Puja celebrations",
+        crowdLevel: "High",
+        category: "Modern Tradition"
+    },
+    {
+        id: 72,
+        name: "31 Pally Sadharan Durgotsab Samity",
+        address: "37/28, Raja Manindra Rd, Tala, Paikpara, Kolkata, West Bengal 700037",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its innovative themes and community participation, this pandal is a favorite among locals. The pandal consistently delivers fresh, creative concepts that engage the community in meaningful ways.",
+        latitude: 22.6172,
+        longitude: 88.3732,
+        specialFeature: "Innovative Themes",
+        area: "North Kolkata",
+        keyInfo: "Creative themes with strong community engagement",
+        crowdLevel: "High",
+        category: "Community Innovation"
+    },
+    {
+        id: 73,
+        name: "Tala Prottoy",
+        address: "J95M+G26, Tala Park Rd, Tala, Kolkata, West Bengal 700037",
+        timing: "6:00 AM - 11:30 PM",
+        description: "This pandal is celebrated for its intricate idol designs and artistic presentations, reflecting the rich cultural heritage of the region. The pandal showcases exceptional craftsmanship and attention to detail.",
+        latitude: 22.6172,
+        longitude: 88.3732,
+        specialFeature: "Intricate Idol Designs",
+        area: "North Kolkata",
+        keyInfo: "Exceptional craftsmanship and detailed idol designs",
+        crowdLevel: "High",
+        category: "Artistic Excellence"
+    },
+    {
+        id: 74,
+        name: "Chorebagan Sarbojanin",
+        address: "Ram Mandir, 127 F, Muktaram Babu St, Simla, Machuabazar, Kolkata, West Bengal 700007",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Known for its traditional charm and artistic presentations, Chorebagan Sarbojanin is a must-visit during Durga Puja. The pandal preserves the authenticity of Bengali traditions while delivering impressive artistic displays.",
+        latitude: 22.5891,
+        longitude: 88.3687,
+        specialFeature: "Traditional Charm",
+        area: "Chorebagan",
+        keyInfo: "Authentic traditional celebration with artistic excellence",
+        crowdLevel: "High",
+        category: "Traditional Excellence"
+    },
+    {
+        id: 76,
+        name: "Suruchi Sangha",
+        address: "500 and 505, Station Rd, Block M, New Alipore, Kolkata, West Bengal 700053",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Suruchi Sangha is celebrated for its traditional themes and community participation, reflecting the cultural heritage of the region. The pandal maintains authentic practices while delivering visually appealing displays.",
+        latitude: 22.5012,
+        longitude: 88.3252,
+        specialFeature: "Traditional Artistry",
+        area: "New Alipore",
+        keyInfo: "Authentic traditional celebrations with community involvement",
+        crowdLevel: "High",
+        category: "Traditional Art"
+    },
+    {
+        id: 79,
+        name: "Deshapriya Park",
+        address: "G993+C9P, Motilal Nehru Rd, Manoharpukur, Kalighat, Kolkata, West Bengal 700029",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Deshapriya Park's pandal is known for its unique themes and artistic presentations, making it a must-visit during Durga Puja. The pandal consistently delivers distinctive themes that stand out from other celebrations in the city.",
+        latitude: 22.5202,
+        longitude: 88.3532,
+        specialFeature: "Unique Themes",
+        area: "Deshapriya Park",
+        keyInfo: "Distinctive themes and artistic excellence",
+        crowdLevel: "High",
+        category: "Unique Expression"
+    },
+    {
+        id: 80,
+        name: "Behala Nutan Dal",
+        address: "16, Sashi Bhushan Mukerjee Rd, Auddy Bagan Basti, Behala, Kolkata, West Bengal 700034",
+        timing: "6:00 AM - 11:30 PM",
+        description: "Behala Nutan Dal is celebrated for its traditional themes and community participation, reflecting the cultural heritage of the region. The pandal maintains authentic practices while delivering visually appealing displays.",
+        latitude: 22.4952,
+        longitude: 88.3171,
+        specialFeature: "Traditional Artistry",
+        area: "Behala",
+        keyInfo: "Authentic traditional celebrations with community involvement",
+        crowdLevel: "High",
+        category: "Traditional Art"
+    },
+    {
+        id: 81,
+        name: "Boasting the Unique 'Time Travel' Theme",
+        address: "36, Mominpore Rd, Ekbalpur, Khidirpur, Kolkata, West Bengal 700023",
+        timing: "6:00 AM - 11:30 PM",
+        description: "This pandal is known for its innovative 'Time Travel' theme, offering a unique experience to visitors. The pandal creates an immersive journey through different eras, blending historical elements with futuristic visions.",
+        latitude: 22.5352,
+        longitude: 88.3282,
+        specialFeature: "Time Travel Theme",
+        area: "South Kolkata",
+        keyInfo: "Immersive experience through different eras",
+        crowdLevel: "High",
+        category: "Innovative Experience"
+    },
+    {
+    id: 82,
+    name: "Kabiraj Bagan Sarbojonin Durgotsav",
+    address: "Kath Gola, Bagmari, Kolkata, West Bengal 700067",
+    timing: "6:00 AM - 11:30 PM",
+    description: "Kabiraj Bagan Sarbojonin Durgotsav is known for its vibrant celebrations and cultural significance in the Bagmari area. The pandal showcases traditional artistry and community involvement, making it a popular destination during Durga Puja.",
+    latitude: 22.5500, // Example coordinates (replace with actual)
+    longitude: 88.3500, // Example coordinates (replace with actual)
+    specialFeature: "Cultural Heritage",
+    area: "Bagmari",
+    keyInfo: "Vibrant traditional celebrations with community participation",
+    crowdLevel: "High",
+    category: "Traditional Art"
+},
+{
+    id: 83,
+    name: "Acharya Prafulla Sangha",
+    address: "P-7, Dr Akshay Kumar Paul Rd, Shimultala, Gopinagar, Behala, Kolkata, West Bengal 700034",
+    timing: "6:00 AM - 11:30 PM",
+    description: "Acharya Prafulla Sangha is celebrated for its artistic themes and community engagement. The pandal often features innovative designs while maintaining traditional values, attracting visitors from across the city.",
+    latitude: 22.4800, // Example coordinates (replace with actual)
+    longitude: 88.3200, // Example coordinates (replace with actual)
+    specialFeature: "Artistic Themes",
+    area: "Behala",
+    keyInfo: "Innovative designs with traditional values",
+    crowdLevel: "High",
+    category: "Artistic Innovation"
+},
+{
+    id: 84,
+    name: "Ajeya Sanghati Durga Puja",
+    address: "47, Mahatma Gandhi Rd, Haridevpur, Paschim Putiary, Kolkata, West Bengal 700082",
+    timing: "6:00 AM - 11:30 PM",
+    description: "Ajeya Sanghati Durga Puja is known for its grand celebrations and elaborate decorations. The pandal reflects the rich cultural heritage of Haridevpur, making it a must-visit during the festival.",
+    latitude: 22.4700, // Example coordinates (replace with actual)
+    longitude: 88.3000, // Example coordinates (replace with actual)
+    specialFeature: "Elaborate Decorations",
+    area: "Haridevpur",
+    keyInfo: "Grand celebrations with rich cultural heritage",
+    crowdLevel: "High",
+    category: "Cultural Heritage"
+},
+{
+    id: 85,
+    name: "Behala Mitra Sangha Durga Puja",
+    address: "91, Roy Bahadur Rd, Behala, Kolkata, West Bengal 700034",
+    timing: "6:00 AM - 11:30 PM",
+    description: "Behala Mitra Sangha Durga Puja is renowned for its community spirit and traditional themes. The pandal is a hub of cultural activities and attracts a large number of devotees and visitors.",
+    latitude: 22.4900, // Example coordinates (replace with actual)
+    longitude: 88.3100, // Example coordinates (replace with actual)
+    specialFeature: "Community Spirit",
+    area: "Behala",
+    keyInfo: "Traditional themes with strong community involvement",
+    crowdLevel: "High",
+    category: "Community Celebration"
+},
+{
+    id: 86,
+    name: "Behala Mukul Sangha Durgotsab",
+    address: "28, Gabtala Lane, 20, Gabtala Ln, Behala, Kolkata, West Bengal 700060",
+    timing: "6:00 AM - 11:30 PM",
+    description: "Behala Mukul Sangha Durgotsab is celebrated for its artistic pandal designs and cultural performances. The event is a blend of tradition and innovation, making it a highlight of Behala's Durga Puja celebrations.",
+    latitude: 22.4850, // Example coordinates (replace with actual)
+    longitude: 88.3150, // Example coordinates (replace with actual)
+    specialFeature: "Artistic Pandal Designs",
+    area: "Behala",
+    keyInfo: "Blend of tradition and innovation",
+    crowdLevel: "High",
+    category: "Artistic Innovation"
+},
+{
+    id: 87,
+    name: "Behala Arunoday Samity",
+    address: "No 2, Khudiram Bose Sarani, Rabindra Nagar, Behala, Kolkata, West Bengal 700060",
+    timing: "6:00 AM - 11:30 PM",
+    description: "Behala Arunoday Samity is known for its vibrant and colorful Durga Puja celebrations. The pandal features unique themes and attracts a large crowd, making it one of the most visited pandals in Behala.",
+    latitude: 22.4870, // Example coordinates (replace with actual)
+    longitude: 88.3170, // Example coordinates (replace with actual)
+    specialFeature: "Vibrant Themes",
+    area: "Behala",
+    keyInfo: "Colorful celebrations with unique themes",
+    crowdLevel: "High",
+    category: "Vibrant Celebration"
+},
+{
+    id: 88,
+    name: "Kashi Bose Lane Durga Puja",
+    address: "5/1, Kashi Bose Ln, Manicktala, Darjipara, Kolkata, West Bengal 700006",
+    timing: "6:00 AM - 11:30 PM",
+    description: "Kashi Bose Lane Durga Puja is famous for its innovative themes and artistic presentations. The pandal attracts huge crowds every year with its creative concepts and stunning decorations, making it a must-visit in North Kolkata.",
+    latitude: 22.5855,
+    longitude: 88.3702,
+    specialFeature: "Innovative Themes & Artistry",
+    area: "Manicktala",
+    keyInfo: "Creative concepts and stunning decorations in North Kolkata",
+    crowdLevel: "Very High",
+    category: "Artistic Innovation"
+}
+        ];
+
+        let map;
+        let markers = [];
+        let filteredPandals = [...durgaPandalData];
+        let mapVisible = false;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                displayPandals(durgaPandalData);
+                addFestiveAnimations();
+            }, 1500);
+            
+            // Add enter key listener for search
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchPandals();
+                }
+            });
+        });
+
+        // Display pandals in grid
+        function displayPandals(pandals) {
+            const grid = document.getElementById('pandalGrid');
+            const noResults = document.getElementById('noResults');
+            
+            if (pandals.length === 0) {
+                grid.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            grid.innerHTML = pandals.map(pandal => `
+                <div class="pandal-card">
+                    <div class="pandal-name">
+                        <i class="fas fa-landmark"></i> ${pandal.name}
+                    </div>
+                    <div class="pandal-address">
+                        <i class="fas fa-map-marker-alt"></i> ${pandal.address}
+                    </div>
+                    <div class="pandal-timing">
+                        <i class="fas fa-clock"></i> ${pandal.timing}
+                    </div>
+                    ${pandal.category ? `<div class="pandal-category">🏛️ ${pandal.category}</div>` : ''}
+                    ${pandal.crowdLevel ? `<div class="crowd-level crowd-${pandal.crowdLevel.toLowerCase().replace(/\s+/g, '-')}">👥 Crowd Level: ${pandal.crowdLevel}</div>` : ''}
+                    <div class="pandal-description">${pandal.description}</div>
+                    ${pandal.keyInfo ? `<div class="key-info">💡 <strong>Key Info:</strong> ${pandal.keyInfo}</div>` : ''}
+                    <div class="pandal-actions">
+                        <button class="btn btn-map" onclick="showOnMap(${pandal.latitude}, ${pandal.longitude}, '${pandal.name.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-map-marked-alt"></i> View on Map
+                        </button>
+                        <button class="btn btn-google-map" onclick="openGoogleMap('${encodeURIComponent(pandal.address)}')">
+                            <i class="fab fa-google"></i> View on Google Map
+                        </button>
+                    </div>
+                    <div class="special-feature">✨ ${pandal.specialFeature}</div>
+                </div>
+            `).join('');
+            
+            // Add fade-in animation to cards
+            setTimeout(() => {
+                addFestiveAnimations();
+            }, 100);
+        }
+
+        // Search functionality
+        function searchPandals() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                filteredPandals = [...durgaPandalData];
+            } else {
+                filteredPandals = durgaPandalData.filter(pandal =>
+                    pandal.name.toLowerCase().includes(searchTerm) ||
+                    pandal.address.toLowerCase().includes(searchTerm) ||
+                    pandal.description.toLowerCase().includes(searchTerm) ||
+                    pandal.area.toLowerCase().includes(searchTerm) ||
+                    pandal.specialFeature.toLowerCase().includes(searchTerm) ||
+                    (pandal.category && pandal.category.toLowerCase().includes(searchTerm)) ||
+                    (pandal.keyInfo && pandal.keyInfo.toLowerCase().includes(searchTerm)) ||
+                    (pandal.crowdLevel && pandal.crowdLevel.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            displayPandals(filteredPandals);
+            
+            if (mapVisible) {
+                updateMapMarkers();
+            }
+        }
+
+        // Toggle map visibility
+        function toggleMap() {
+            const mapContainer = document.getElementById('mapContainer');
+            const toggleBtn = document.getElementById('mapToggleBtn');
+            
+            if (!mapVisible) {
+                mapContainer.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Hide Map';
+                mapVisible = true;
+                
+                if (!map) {
+                    initializeMap();
+                }
+                
+                setTimeout(() => {
+                    if (map) {
+                        map.invalidateSize();
+                        updateMapMarkers();
+                    }
+                }, 100);
+            } else {
+                mapContainer.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Show Map';
+                mapVisible = false;
+            }
+        }
+
+        // Initialize map
+        function initializeMap() {
+            map = L.map('map').setView([22.5726, 88.3639], 11);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // Update map markers
+        function updateMapMarkers() {
+            if (!map) return;
+            
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            // Add markers for filtered pandals
+            filteredPandals.forEach(pandal => {
+                const marker = L.marker([pandal.latitude, pandal.longitude])
+                    .addTo(map)
+                    .bindPopup(`
+                        <div style="max-width: 220px;">
+                            <h4>${pandal.name}</h4>
+                            <p><i class="fas fa-map-marker-alt"></i> ${pandal.address}</p>
+                            <p><i class="fas fa-clock"></i> ${pandal.timing}</p>
+                            <p>${pandal.description.substring(0, 100)}...</p>
+                            <span style="background: linear-gradient(45deg, #ffd700, #ffed4e); color: #8B0000; padding: 3px 8px; border-radius: 12px; font-size: 12px; display: inline-block; margin-top: 5px;">✨ ${pandal.specialFeature}</span>
+                        </div>
+                    `);
+                
+                markers.push(marker);
+            });
+            
+            // Fit map to show all markers
+            if (markers.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        // Show specific location on map
+        function showOnMap(lat, lng, name) {
+            if (!mapVisible) {
+                toggleMap();
+            }
+            
+            setTimeout(() => {
+                if (map) {
+                    map.setView([lat, lng], 16);
+                    
+                    // Find and open popup for this location
+                    markers.forEach(marker => {
+                        const markerLatLng = marker.getLatLng();
+                        if (Math.abs(markerLatLng.lat - lat) < 0.001 && Math.abs(markerLatLng.lng - lng) < 0.001) {
+                            marker.openPopup();
+                        }
+                    });
+                    
+                    // Scroll to map
+                    document.getElementById('mapContainer').scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }, 300);
+        }
+
+        // Open location in Google Maps
+        function openGoogleMap(address) {
+            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
+            window.open(googleMapsUrl, '_blank');
+        }
+
+        // Add festive animations
+        function addFestiveAnimations() {
+            const cards = document.querySelectorAll('.pandal-card');
+            cards.forEach((card, index) => {
+                card.style.animation = `fadeInUp 0.6s ease forwards`;
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.style.opacity = '0';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, index * 100);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pujor Morsum</title>
+    <style>
+        /* Global Reset */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrolling during splash screen */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        /* The Main Splash Container */
+        .splash-container {
+            position: fixed; /* Ensures it covers the entire viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff; /* Fallback background */
+        }
+
+        /* Background Image Styling (Responsive) */
+        .splash-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures image covers the screen without distortion */
+            opacity: 0.8; 
+            z-index: 0; /* Keep image behind text */
+        }
+
+        /* Title Styling (Responsive Typography) */
+        .splash-title {
+            position: relative;
+            z-index: 1; /* Keep text above the image */
+            
+            /* Responsive Font Size: Scales with viewport width (vw) */
+            font-size: 10vw; 
+            
+            /* Max size limitation for very large screens is handled by media query below */
+            
+            font-weight: 900;
+            font-style: italic;
+            
+            /* Festive Color and Contrast */
+            color: #FF4500; /* A vibrant Orange-Red */
+            text-shadow: 
+                3px 3px 5px rgba(0, 0, 0, 0.8), /* Stronger shadow for readability */
+                0 0 15px rgb(255, 255, 255); /* Slight white glow */
+            
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Media query for desktop screens to prevent text from getting too big */
+        @media (min-width: 768px) {
+            .splash-title {
+                font-size: 50px; /* Fixed size on larger devices */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-container">
+        <!-- Using a high-resolution, relevant image -->
+        <img src="f1.jpg" alt="Pujo Celebration Background">
+    </div>
+
+    <script>
+        // Set the timer for 3 seconds (3000 milliseconds)
+        setTimeout(function() {
+            // Redirect to the actual webpage
+            window.location.href = "webp2-2.html";
+        }, 3000);
+    </script>
+</body>
+</html>

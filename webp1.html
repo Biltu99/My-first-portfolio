@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <title>grocery web demo project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- code for css ster rating -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- code for font awesome -->
+
+    <style>
+    
+        *{
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: x-large;
+            
+        }
+        a
+        {
+            margin: 0%;
+            padding: 0%;
+            border: none;
+            outline: none;
+            text-decoration: none;
+            text-transform: capitalize;
+            transition: all .3s linear ;
+            color: var(--black);
+        }
+        a:hover
+        {
+            color: var(--green);
+        }
+        p:hover
+        {
+            color: var(--green);
+        }
+        :root
+        {
+            --green : green;
+            --black : #2c2c2cd0;
+            --light-color : #666;
+            --box-shadow: 0 .2rem 1rem rgba(0,0,0.1);
+            --border : 2rem solid rgba(0,0,0.1);
+            --outline : 1rem solid rgba(0,0,0.1);
+        }
+        header
+        {
+            border: 0px solid;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2rem 9%;
+            background: #fff;
+            box-shadow: var(--box-shadow);
+        }
+        #icon div
+        {
+            border: 0px solid;
+            border-radius: .5rem;
+            height: 4.5rem;
+            width: 3.7rem;
+            line-height: 4.5rem;
+            font-size: 2rem;
+            background: #eee;
+            color: var(--black);
+            margin-right:.3rem ;
+            text-align: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        #icon div:hover
+        {
+            background: var(--green);
+        }
+        #search-box
+        {
+            border: 1px solid;
+            top: 105%;
+            right: 10%;
+            width: 15rem;
+            height: 1.5rem;
+            background: #fff;
+            border-radius: .5rem;
+            display: flex;
+            align-items: center;
+            color: var(--box-shadow);
+            box-shadow: var(--box-shadow);
+        }
+        #p1
+        {
+            display: flex;
+            align-items: center;
+            text-align: center ;
+            justify-content:center;  
+            width: auto;
+        }
+        section{
+            padding: 11rem 10%;
+        }
+        #home
+        { 
+            justify-content: center;
+            width: auto;
+            border: 1px solid;
+            background:url(https://static.vecteezy.com/system/resources/previews/030/631/486/non_2x/ai-generated-image-of-a-picture-frame-made-up-of-fruits-and-vegetables-on-white-background-free-photo.jpg) no-repeat;
+            background-position: center;
+            background-size: cover;
+            padding-top: 17rem;
+            padding-bottom: 10rem;
+        }
+        #or
+        {
+            color: var(--green);
+        }
+        #item
+        {
+            padding: 0%;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            box-shadow: var(--box-shadow);           
+        }
+        #features
+        {
+            padding: 0%;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            box-shadow: var(--box-shadow);
+        }
+        #end
+        {
+            padding: 3%;
+            display: flex;
+            box-shadow: var(--box-shadow);
+            background: gray;
+            background-position: center;
+            background-size: cover;
+            
+            
+        }
+        label
+        {
+            margin: 2%;
+            padding: 0%;
+            color: white;
+            text-align: left;
+            align-items: left;
+            justify-content: left;
+            text-transform: capitalize;
+            cursor: pointer;
+        }
+        #lb
+        {
+            text-align: left;
+            align-items: left;
+            justify-content: left;
+            background-position: center;
+            background-size: cover;
+            display: flex;
+        }
+        #center{
+            display: flex;
+            background-position: center;
+            background-size: cover;
+            
+        }
+    </style>
+
+    <script>
+        // This will run as soon as the page loads
+        alert("This is a demo project");
+    </script>
+
+</head>
+<!--body_start-->
+<body>
+    <div id="center">
+        <form>
+    <div id="p1">
+    <div>
+    <header>
+        <div>
+        <a rel="stylesheet" href="#"> <i class="fa fa-shopping-basket" aria-hidden="true"> Grocery</i></a>
+        </div>
+        <a href="home">home</a>
+        <a href="features">features</a>
+        <a href="products">products</a>
+        <a href="categories">categories</a>
+        <a href="review">review</a>
+    
+        <input type="search" id="search-box" placeholder="search here.....">      
+        <div class="fa fa-cart-plus" aria-hidden="true">
+        
+        </div>
+    </header>
+
+    </div >
+    <!--paragraph-->
+    <section class="home" id="home">
+    <h1>Fresh And <a id="or">organic</a> products for you</h1>
+    <h3>we believe that real food comes from real sources. That’s why we’re dedicated to bringing you the freshest, organically grown produce and pantry staples—straight from local farms to your table. Every item we offer is carefully selected to ensure it meets the highest standards of quality, sustainability, and taste. Whether you're shopping for your weekly groceries or just looking to eat a little cleaner, we make healthy living simple, natural, and delicious. Because you deserve food that’s as pure as your lifestyle.</h3>
+    <button onclick="Now">Shop Now</button>
+    </section>
+    
+    </div> 
+    <!--paragraph_close-->
+
+    <!--our basket start-->
+    <div>
+    <section class="item" id="item">
+        <h1>Our <a id="or">Basket</a></h1><br>
+    </section>
+
+    <div style="display: flex;  justify-content: space-between;">
+
+    <div style="border: 1px solid;">
+        <img src="https://images2.alphacoders.com/719/thumb-1920-719435.jpg" height="300px" width="370px">
+        <p style="padding: 0%; margin: 0%;">fresho! Apple - Shimla, 4 pcs <br>(Approx. 510 to 560 g)</p>
+        <p>Price: ₹169   <button onclick="buy" style="background-color: red;"><a href="web1(item).html" style="color: #fff;">Add to cart</a></button><br>You Save: 52% OFF</p>
+    </div>
+    <div style="border: 1px solid;">
+        <img src="https://www.bigbasket.com/media/uploads/p/l/10000071_15-fresho-carrot-orange.jpg" height="300px" width="370px">
+        <p style="padding: 0%; margin: 0%;">fresho! Carrot - Orange (Loose), <br>1 kg</p>
+        <p>Price: ₹38 <button onclick="buy" style="background-color: red;"><a href="web1(item2).html" style="color: #fff;">Add to cart</a></button><br>You Save: 21% OFF</p>
+    </div>
+    <div style="border: 1px solid;">
+        <img src="https://cdn.shopk.it/usercontent/pomarfeliz/media/images/a0f4942-banana_600797891.jpg" height="300px" width="370px">
+        <p style="padding: 0%; margin: 0%;">fresho! Banana - Robusta, 1 kg <br>(Approx. 510 to 560 g)</p>
+        <p>Price: ₹44.93 <button onclick="buy" style="background-color: red;"><a href="web1(item3).html" style="color: #fff;">Add to cart</a></button><br>You Save: 38% OFF</p>
+    </div>
+    <div style="border: 1px solid;">
+        <img src="https://www.bigbasket.com/media/uploads/p/m/10000067_26-fresho-capsicum-green.jpg" height="300px" width="370px">
+        <p style="padding: 0%; margin: 0%;">fresho! Capsicum - Green (Loose),<br> 1 kg </p>
+        <p>Price: ₹48  <button onclick="buy" style="background-color: red;"><a href="web1(item4).html" style="color: #fff;">Add to cart</a></button><br>You Save: 32% OFF</p>
+    </div>
+
+    </div></div>
+    <!--our basket line 2-->
+    <div>
+        <section class="item" id="item">
+            <a id="or"></a><br>
+        </section>
+    
+        <div style="display: flex;  justify-content: space-between;">
+    
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/l/10000074_20-fresho-cauliflower.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Cauliflower,<br> 1 pc (approx. 400 to 600 g)</p>
+            <p>Price: ₹26.90  <button onclick="buy" style="background-color: red;"><a href="web1(item5).html" style="color: #fff;">Add to cart</a></button> <br>You Save: 26% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/xl/10000326_14-fresho-coriander-leaves.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Coriander Leaves,<br></p>
+            <p>Price: ₹88.90 <button onclick="buy" style="background-color: red;"><a href="web1(item6).html" style="color: #fff;">Add to cart</a></button> <br>You Save: 46% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/l/10000327_14-fresho-curry-leaves.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Curry Leaves, <br>1 kg</p><br>
+            <p>Price: ₹38.90<button onclick="buy" style="background-color: red;"><a href="web1(item7).html" style="color: #fff;">Add to cart</a></button><br>You Save: 34% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/xl/40047637_5-fresho-potato-chandramukhi-organically-grown.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Potato, <br>5 kg</p>
+            <p>Price: ₹44.93<button onclick="buy" style="background-color: red;"><a href="web1(item8).html" style="color: #fff;">Add to cart</a></button><br>You Save: 23% OFF</p>
+        </div>
+    
+        </div></div>
+    <!--our basket line 3-->
+
+<div>
+        <section class="item" id="item">
+            <a id="or"></a><br>
+        </section>
+    
+        <div style="display: flex;  justify-content: space-between;">
+    
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/xl/40023472_6-fresho-onion-organically-grown.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Onion,<br> 5 x 1 kg Multipack</p>
+            <p>Price: ₹137.82  <button onclick="buy" style="background-color: red;"><a href="web1(item9).html" style="color: #fff;">Add to cart</a></button> <br>You Save: 28% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/l/10000203_18-fresho-tomato-local.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Tomato - Local,<br> 2 x 1 kg Multipack</p>
+            <p>Price: ₹38.90 <button onclick="buy" style="background-color: red;"><a href="web1(item10).html" style="color: #fff;">Add to cart</a></button><br>You Save: 47% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/m/50000524_7-fresho-ladies-finger-organically-grown.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Ladies’ Fingers - Premium,  <br>4 kg</p>
+            <p>Price: ₹68 <button onclick="buy" style="background-color: red;"><a href="web1(item11).html" style="color: #fff;">Add to cart</a></button><br>(inclusive of all taxes)</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://th.bing.com/th/id/OIP.h6ceW9JGzOeWr3f8k_hVfAHaHa?rs=1&pid=ImgDetMain" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">Britannia 100% Whole Wheat Bread,<br> 400 g</p>
+            <p>Price: ₹55.90 <button onclick="buy" style="background-color: red;"><a href="web1(item12).html" style="color: #fff;">Add to cart</a></button> <br>You Save: 46% OFF</p>
+        </div>
+
+        </div></div>
+
+        <!--our basket line 4-->
+    <div>
+        <section class="item" id="item">
+            <a id="or"></a><br>
+        </section>
+    
+        <div style="display: flex;  justify-content: space-between;">
+    
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/l/10000263_14-fresho-strawberry.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Strawberry, <br>200 g</p>
+            <p>Price: ₹111.50 <button onclick="buy" style="background-color: red;"><a href="web1(item13).html" style="color: #fff;">Add to cart</a></button> <br>You Save: 20% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/m/10000063_21-fresho-broccoli.jpg"height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Broccoli, <br>1 pc (Approx. 250g-500g)</p>
+            <p>Price: ₹34<button onclick="buy" style="background-color: red;"><a href="web1(item14).html" style="color: #fff;">Add to cart</a></button><br>You Save: 27% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://5.imimg.com/data5/BQ/GP/UB/SELLER-95589009/fresh-green-grapes-500x500.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">fresho! Grapes - Green Afgan,<br> 500 g</p>
+            <p>Price: ₹155.12 <button onclick="buy" style="background-color: red;"><a href="web1(item15).html" style="color: #fff;">Add to cart</a></button><br>You Save: 23% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://m.media-amazon.com/images/S/aplus-media/vc/5352f337-cd65-425a-9010-da946e9cefcd.__CR0,0,300,300_PT0_SX300_V1___.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">Tata Tea Gold Care Tea, <br>1 kg</p>
+            <p>Price: ₹529.3 <button onclick="buy" style="background-color: red;"><a href="web1(item16).html" style="color: #fff;">Add to cart</a></button> <br>You Save: 21% OFF</p>
+        </div>
+
+        </div></div>
+
+        <!--our basket line 5-->
+    <div>
+        <section class="item" id="item">
+            <a id="or"></a><br>
+        </section>
+    
+        <div style="display: flex;  justify-content: space-between;">
+    
+        <div style="border: 1px solid;">
+            <img src="https://www.bigbasket.com/media/uploads/p/xl/40189242_6-kelloggs-muesli-breakfast-cereal-with-multigrain-21-fruit-nut-seeds.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">Kellogg's Muesli Fruit Nut & Seeds <br> - 12 In 1 Power Breakfast, 750 g </p>
+            <p>Price: ₹456.25 <button onclick="buy" style="background-color: red;"><a href="web1(item17).html" style="color: #fff;">Add to cart</a></button> <br>You Save: 0.6% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://m.media-amazon.com/images/I/71U2W8KY0NL._SL1500_.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">Kellogg's Corn Flakes - Original, <br>High In Iron & B Group Vitamins,<br>+ Breakfast Cereals, 900 g</p>
+            <p>Price: ₹399<button onclick="buy" style="background-color: red;"><a href="web1(item18).html" style="color: #fff;">Add to cart</a></button><br>You Save: 0.64% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://onemg.gumlet.io/l_watermark_346,w_690,h_700/a_ignore,w_690,h_700,c_pad,q_auto,f_auto/03f7622a822545309d15941a02abd151.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">Ensure Diabetes Care Specialized<BR> Nutrition Drink - Vanilla Delight, <br>950 g Box</p>
+            <p>Price: ₹1244.12 <button onclick="buy" style="background-color: red;"><a href="web1(item19).html" style="color: #fff;">Add to cart</a></button><br>You Save: 23% OFF</p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://newassets.apollo247.com/pub/media/catalog/product/p/e/ped0233_7_choco_400_front_1.jpg" height="300px" width="370px">
+            <p style="padding: 0%; margin: 0%;">Pediasure 7+ Specialized Nutrition <br>Drink Powder - For Growing Children, <br>Chocolate Flavour, 400 g Box</p>
+            <p>Price: ₹615  <button onclick="buy" style="background-color: red;"><a href="web1(item20).html" style="color: #fff;">Add to cart</a></button><br>(inclusive of all taxes)</p>
+        </div>
+
+        </div></div>
+
+    <!--our basket end-->
+
+    <!--our review start-->
+    <div>
+        <section class="item" id="item">
+            <h1>Our <a id="or">Review</a></h1><br>
+        </section>
+    
+        <div style="display: flex;  justify-content: space-between;">
+    
+        <div style="border: 1px solid;">
+            <img src="https://th.bing.com/th/id/OIP.60Aq9bjpWzHiRCyencWx7gAAAA?rs=1&pid=ImgDetMain" height="250px" width="350px">
+            <p style="padding: 0%; margin: 0%; text-align: center; color: black;">Mr.jon</p>
+            <p style="padding: 0%; margin: 0%; text-align: center;">
+                <i class="fa fa-star" aria-hidden="true"></i>
+                <i class="fa fa-star" aria-hidden="true"></i>
+                <i class="fa fa-star" aria-hidden="true"></i>
+                <i class="fa fa-star-half-o" aria-hidden="true"></i>
+                <i class="fa fa-star-o" aria-hidden="true"></i>
+            </p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://img.freepik.com/premium-photo/happy-smiling-indian-business-man-leader-looks-away-with-confidence-standing-office-smiling-young-professional-businessman-manager-executive-from-india_896590-933.jpg" height="250px" width="350px">
+            <p style="padding: 0%; margin: 0%; text-align: center; color: black;">Mr.reddy</p>
+            <p style="padding: 0%; margin: 0%; text-align: center;">
+                <i class="fa fa-star" aria-hidden="true"></i>
+                <i class="fa fa-star" aria-hidden="true"></i>
+                <i class="fa fa-star-half-o" aria-hidden="true"></i>
+                <i class="fa fa-star-o" aria-hidden="true"></i>
+                <i class="fa fa-star-o" aria-hidden="true"></i>
+            </p>
+        </div>
+        <div style="border: 1px solid;">
+            <img src="https://img.freepik.com/premium-photo/successful-indian-business-woman-portrait-confident-entrepreneur_753390-9319.jpg" height="250px" width="350px">
+            <p style="padding: 0%; margin: 0%; text-align: center; color: black;">Mrs.devi</p>
+            <p style="padding: 0%; margin: 0%; text-align: center;"><i class="fa fa-star" aria-hidden="true"></i>
+                <i class="fa fa-star" aria-hidden="true"></i>
+                <i class="fa fa-star" aria-hidden="true"></i>
+                <i class="fa fa-star-half-o" aria-hidden="true"></i>
+                <i class="fa fa-star-o" aria-hidden="true"></i>
+            </p>
+        </div>
+    
+        </div></div>
+        <!--our review end-->
+
+    <!--feature starts-->
+    <div>
+    
+    <section class="features" id="features">
+        <h1>Our <a id="or">Features</a></h1><br>
+    </section>
+    </div>
+<div style="display: flex;  justify-content: space-between;">
+        <div style="border: 1px solid;">
+        <img src="https://www.pngitem.com/pimgs/m/340-3407664_transparent-delivery-van-icon-clipart-png-download-transparent.png" height="150px" width="450px">
+        <p style="padding: 0%; margin: 0%; text-align: center; color: black;">90min First Delivery</p>
+    </div>
+    <div style="border: 1px solid;">
+        <img src="https://static.vecteezy.com/system/resources/previews/021/668/371/original/cash-donation-icon-style-vector.jpg" height="150px" width="450px">
+        <p style="padding: 0%; margin: 0%;text-align: center;color: black">Cash on Delivery Available</p>
+    </div>
+    <div style="border: 1px solid;">
+        <img src="https://img.freepik.com/premium-vector/safe-delivery-icon-with-box_116137-2393.jpg" height="150px" width="450px">
+        <p style="padding: 0%; margin: 0%;text-align: center;color: black">Safe Delivery </p>
+        
+    </div>
+    </div></div>
+    <!--feature end-->
+
+
+    <!--about us-->
+    
+    <div >
+        <section class="end" id="end">
+            <a id="or"></a><br>
+            
+            <div id="lb" >
+            <div>
+            <label><a href="#" style="color: #eee;">About Us</a></label> <br>
+            <label><a href="#" style="color: #eee;">in news</a></label><br>
+            <label><a href="#" style="color: #eee;">privacy policy</a></label><br>
+            <label><a href="#"style="color: #eee;">term and conditions</a></label><br>
+            <label><a href="#"style="color: #eee;">help</a></label><br>
+            <label><a href="#"style="color: #eee;">FAQS</a></label><br>
+            <label><a href="#"style="color: #eee;">contact us</a></label><br><br>
+            <p style="color: black;">Developed by Biltu Kundu</p>
+            
+            <div style="display: flex; align-items: left; justify-content: left;">
+             
+                <i class="fa fa-android" aria-hidden="true"></i>
+                <i class="fa fa-apple" aria-hidden="true"></i>
+                <i class="fa fa-desktop" aria-hidden="true"></i>
+               
+            </div>
+            </div>
+           </div></section>
+           </div>
+
+        
+    
+       </div>
+    
+
+</body>
+</html>

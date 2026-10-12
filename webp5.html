@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Escape the Crocodile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: none;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a2980;
+            color: white;
+            height: 100vh;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Start Screen */
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #startScreen h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        #startScreen p {
+            font-size: 20px;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #e0f7fa;
+        }
+
+        #startButton {
+            padding: 15px 40px;
+            font-size: 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #startButton:hover {
+            background: #45a049;
+        }
+
+        /* Game UI */
+        #gameUI {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            font-size: 22px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Game Over Screen */
+        #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            color: white;
+            text-align: center;
+        }
+
+        #gameOverScreen h1 {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #ff4444;
+            text-shadow: 3px 3px 0 #000;
+        }
+
+        #gameOverScreen p {
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+
+        #restartButton {
+            padding: 15px 40px;
+            font-size: 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #restartButton:hover {
+            background: #45a049;
+        }
+
+        /* Instructions */
+        #instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            z-index: 10;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <h1>Escape the Crocodile</h1>
+            <p>🌊 Collect fish in the water to score points!<br>
+               🌿 The land is your safe zone — crocodile stops when you're on land.<br>
+               🐊 Avoid the crocodile! It speeds up every 20 seconds!<br>
+               🖱️ Use arrow keys (desktop) or touch/drag (mobile) to move.</p>
+            <button id="startButton">Start Game</button>
+        </div>
+
+        <!-- Game UI -->
+        <div id="gameUI">
+            <div>Score: <span id="score">0</span></div>
+            <div>Time: <span id="time">0</span>s</div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen">
+            <h1>Game Over!</h1>
+            <p>Your Score: <span id="finalScore">0</span></p>
+            <button id="restartButton">Play Again</button>
+        </div>
+
+        <div id="instructions">
+            Drag to move (mobile) | Arrow Keys (desktop)
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const startButton = document.getElementById('startButton');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const restartButton = document.getElementById('restartButton');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const finalScoreDisplay = document.getElementById('finalScore');
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Game constants
+        const LAND_HEIGHT = 100;
+        const PLAYER_WIDTH = 50;
+        const PLAYER_HEIGHT = 60;
+        const CROC_WIDTH = 80;
+        const CROC_HEIGHT = 40;
+        const FISH_WIDTH = 30;
+        const FISH_HEIGHT = 20;
+
+        // Game state
+        let score = 0;
+        let gameTime = 0;
+        let gameRunning = false;
+        let lastTime = 0;
+        let speedBoostTime = 0; // Tracks time since last speed boost
+
+        // Characters (image-ready)
+        const playerImage = new Image();
+        const crocodileImage = new Image();
+        const fishImage = new Image();
+
+        // Replace these with your actual image paths
+        playerImage.src = 'player.png';
+        crocodileImage.src = 'crocodile.png';
+        fishImage.src = 'fish.png';
+
+        // Track if images are loaded
+        let imagesLoaded = {
+            player: false,
+            crocodile: false,
+            fish: false
+        };
+
+        playerImage.onload = () => imagesLoaded.player = true;
+        crocodileImage.onload = () => imagesLoaded.crocodile = true;
+        fishImage.onload = () => imagesLoaded.fish = true;
+
+        // Player and enemies
+        const player = {
+            x: 100,
+            y: canvas.height - LAND_HEIGHT - PLAYER_HEIGHT,
+            width: PLAYER_WIDTH,
+            height: PLAYER_HEIGHT,
+            speed: 5
+        };
+
+        const crocodile = {
+            x: canvas.width - 150,
+            y: canvas.height - LAND_HEIGHT - CROC_HEIGHT / 2,
+            width: CROC_WIDTH,
+            height: CROC_HEIGHT,
+            speed: 2.5, // Slightly faster initial speed
+            baseSpeed: 2.5
+        };
+
+        const fish = [];
+        const trees = [];
+
+        // Input handling
+        const keys = {
+            ArrowUp: false,
+            ArrowDown: false,
+            ArrowLeft: false,
+            ArrowRight: false
+        };
+
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+
+        // Initialize game world
+        function initGame() {
+            // Reset state
+            score = 0;
+            gameTime = 0;
+            speedBoostTime = 0;
+            gameRunning = true;
+            scoreDisplay.textContent = score;
+            timeDisplay.textContent = Math.floor(gameTime);
+
+            // Reset positions
+            player.x = 100;
+            player.y = canvas.height - LAND_HEIGHT - PLAYER_HEIGHT;
+            crocodile.x = canvas.width - 150;
+            crocodile.y = canvas.height - LAND_HEIGHT - CROC_HEIGHT / 2;
+            crocodile.speed = crocodile.baseSpeed; // Reset to base speed
+
+            // Clear fish and create new ones
+            fish.length = 0;
+            for (let i = 0; i < 8; i++) {
+                createFish();
+            }
+
+            // Create trees
+            trees.length = 0;
+            for (let i = 0; i < 6; i++) {
+                trees.push({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height - LAND_HEIGHT,
+                    trunkWidth: 20 + Math.random() * 10,
+                    trunkHeight: 70 + Math.random() * 30,
+                    canopySize: 50 + Math.random() * 20
+                });
+            }
+        }
+
+        function createFish() {
+            fish.push({
+                x: Math.random() * (canvas.width - FISH_WIDTH),
+                y: Math.random() * (canvas.height - LAND_HEIGHT - 100) + 50,
+                width: FISH_WIDTH,
+                height: FISH_HEIGHT,
+                bobOffset: Math.random() * Math.PI * 2,
+                bobSpeed: Math.random() * 0.05 + 0.02
+            });
+        }
+
+        // DRAWING FUNCTIONS
+        function drawWater() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height - LAND_HEIGHT);
+            gradient.addColorStop(0, '#1e5799');
+            gradient.addColorStop(1, '#207cca');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height - LAND_HEIGHT);
+
+            // Simple wave effect
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 1;
+            for (let y = 50; y < canvas.height - LAND_HEIGHT; y += 30) {
+                ctx.beginPath();
+                for (let x = 0; x < canvas.width; x += 10) {
+                    const waveY = y + Math.sin((x + gameTime * 2) * 0.02) * 3;
+                    if (x === 0) ctx.moveTo(x, waveY);
+                    else ctx.lineTo(x, waveY);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function drawLand() {
+            // Land
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, canvas.height - LAND_HEIGHT, canvas.width, LAND_HEIGHT);
+            // Grass
+            ctx.fillStyle = '#2ecc71';
+            ctx.fillRect(0, canvas.height - LAND_HEIGHT, canvas.width, 10);
+
+            // Trees
+            trees.forEach(tree => {
+                // Trunk
+                ctx.fillStyle = '#5D4037';
+                ctx.fillRect(
+                    tree.x - tree.trunkWidth / 2,
+                    tree.y - tree.trunkHeight,
+                    tree.trunkWidth,
+                    tree.trunkHeight
+                );
+                // Canopy
+                ctx.fillStyle = '#2E7D32';
+                ctx.beginPath();
+                ctx.arc(tree.x, tree.y - tree.trunkHeight, tree.canopySize / 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawPlayer() {
+            if (imagesLoaded.player) {
+                ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+            } else {
+                // Draw fallback player character
+                ctx.fillStyle = '#3498db';
+                ctx.fillRect(player.x, player.y + 20, player.width, player.height - 20);
+                
+                // Head
+                ctx.fillStyle = '#f1c40f';
+                ctx.beginPath();
+                ctx.arc(player.x + player.width / 2, player.y + 15, 15, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Eyes
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(player.x + player.width / 2 - 5, player.y + 13, 4, 0, Math.PI * 2);
+                ctx.arc(player.x + player.width / 2 + 5, player.y + 13, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = 'black';
+                ctx.beginPath();
+                ctx.arc(player.x + player.width / 2 - 5, player.y + 13, 2, 0, Math.PI * 2);
+                ctx.arc(player.x + player.width / 2 + 5, player.y + 13, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawCrocodile() {
+            if (imagesLoaded.crocodile) {
+                ctx.drawImage(crocodileImage, crocodile.x, crocodile.y, crocodile.width, crocodile.height);
+            } else {
+                // Draw fallback crocodile
+                ctx.fillStyle = '#27ae60';
+                ctx.fillRect(crocodile.x, crocodile.y, crocodile.width, crocodile.height);
+                
+                // Head
+                ctx.fillRect(crocodile.x - 30, crocodile.y + 5, 30, 30);
+                
+                // Eyes
+                ctx.fillStyle = 'red';
+                ctx.beginPath();
+                ctx.arc(crocodile.x - 15, crocodile.y + 15, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Teeth
+                ctx.fillStyle = 'white';
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillRect(crocodile.x - 25, crocodile.y + 25 + i * 5, 3, 8);
+                }
+                
+                // Tail
+                ctx.fillStyle = '#27ae60';
+                ctx.beginPath();
+                ctx.moveTo(crocodile.x + crocodile.width, crocodile.y + crocodile.height / 2);
+                ctx.lineTo(crocodile.x + crocodile.width + 20, crocodile.y);
+                ctx.lineTo(crocodile.x + crocodile.width + 20, crocodile.y + crocodile.height);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        function drawFish() {
+            fish.forEach(f => {
+                const bobY = Math.sin(f.bobOffset + gameTime * f.bobSpeed) * 4;
+                
+                if (imagesLoaded.fish) {
+                    ctx.drawImage(fishImage, f.x, f.y + bobY, f.width, f.height);
+                } else {
+                    // Draw fallback fish
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.beginPath();
+                    ctx.ellipse(f.x + f.width/2, f.y + bobY + f.height/2, f.width/2, f.height/2, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Tail
+                    ctx.beginPath();
+                    ctx.moveTo(f.x + f.width, f.y + bobY + f.height/2);
+                    ctx.lineTo(f.x + f.width + 10, f.y + bobY);
+                    ctx.lineTo(f.x + f.width + 10, f.y + bobY + f.height);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Eye
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(f.x + 5, f.y + bobY + f.height/2, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'black';
+                    ctx.beginPath();
+                    ctx.arc(f.x + 5, f.y + bobY + f.height/2, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        // GAME LOGIC
+        function update() {
+            if (!gameRunning) return;
+
+            // Keyboard movement (desktop)
+            if (keys.ArrowUp && player.y > 0) player.y -= player.speed;
+            if (keys.ArrowDown && player.y < canvas.height - player.height) player.y += player.speed;
+            if (keys.ArrowLeft && player.x > 0) player.x -= player.speed;
+            if (keys.ArrowRight && player.x < canvas.width - player.width) player.x += player.speed;
+
+            // Check if player is on land (safe zone)
+            const isOnLand = player.y + player.height >= canvas.height - LAND_HEIGHT;
+
+            // Move crocodile only if player is in water
+            if (!isOnLand) {
+                const dx = player.x - crocodile.x;
+                const dy = player.y - crocodile.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 0) {
+                    crocodile.x += (dx / dist) * crocodile.speed;
+                    crocodile.y += (dy / dist) * crocodile.speed;
+                }
+                
+                // Speed boost every 20 seconds
+                speedBoostTime += 1/60; // Assuming 60 FPS
+                if (speedBoostTime >= 20) {
+                    crocodile.speed *= 2; // Double the speed
+                    speedBoostTime = 0; // Reset timer
+                }
+            } else {
+                // When on land, reset speed boost timer
+                speedBoostTime = 0;
+            }
+
+            // Fish collection
+            for (let i = fish.length - 1; i >= 0; i--) {
+                const f = fish[i];
+                const dx = player.x + player.width / 2 - (f.x + f.width / 2);
+                const dy = player.y + player.height / 2 - (f.y + f.height / 2);
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 40) {
+                    fish.splice(i, 1);
+                    score += 10;
+                    scoreDisplay.textContent = score;
+                    createFish();
+                }
+            }
+
+            // Collision with crocodile
+            const dx = player.x + player.width / 2 - (crocodile.x + crocodile.width / 2);
+            const dy = player.y + player.height / 2 - (crocodile.y + crocodile.height / 2);
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 60) {
+                gameOver();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawWater();
+            drawLand();
+            drawFish();
+            drawPlayer();
+            drawCrocodile();
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            finalScoreDisplay.textContent = score;
+            gameOverScreen.style.display = 'flex';
+        }
+
+        function gameLoop(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const delta = timestamp - lastTime;
+            
+            if (delta >= 16) { // ~60 FPS
+                if (gameRunning) {
+                    gameTime += delta / 1000;
+                    timeDisplay.textContent = Math.floor(gameTime);
+                    update();
+                    draw();
+                }
+                lastTime = timestamp;
+            }
+
+            if (gameRunning) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // TOUCH CONTROLS (Mobile)
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDragging = true;
+            const touch = e.touches[0];
+            dragStartX = touch.clientX - player.x;
+            dragStartY = touch.clientY - player.y;
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDragging || !gameRunning) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            player.x = touch.clientX - dragStartX;
+            player.y = touch.clientY - dragStartY;
+
+            // Boundary checks
+            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+            player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+        });
+
+        canvas.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // KEYBOARD CONTROLS
+        window.addEventListener('keydown', (e) => {
+            if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
+        });
+
+        // BUTTONS
+        startButton.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            initGame();
+            requestAnimationFrame(gameLoop);
+        });
+
+        restartButton.addEventListener('click', () => {
+            gameOverScreen.style.display = 'none';
+            initGame();
+            requestAnimationFrame(gameLoop);
+        });
+
+        // RESIZE HANDLER
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            if (gameRunning) {
+                player.x = Math.min(player.x, canvas.width - player.width);
+                player.y = Math.min(player.y, canvas.height - player.height);
+            }
+        });
+    </script>
+</body>
+</html>

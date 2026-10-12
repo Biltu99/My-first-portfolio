@@ -1,0 +1,560 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤪 Funny Calculator 🤪</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+            width: 100%;
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .title {
+            font-size: 2.5em;
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+            border-radius: 25px;
+            padding: 5px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .display {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: right;
+            font-size: 2em;
+            font-family: 'Courier New', monospace;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .result-comment {
+            background: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            animation: slideIn 0.5s ease-out;
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #f0f0f0, #cacaca);
+            box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
+            color: #333;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn.operator {
+            background: linear-gradient(145deg, #ff6b6b, #ff8e8e);
+            color: white;
+        }
+
+        .btn.equals {
+            background: linear-gradient(145deg, #4ecdc4, #44a08d);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn.clear {
+            background: linear-gradient(145deg, #ffa500, #ff8c00);
+            color: white;
+        }
+
+        .btn.mode-toggle-btn {
+            background: linear-gradient(145deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .bounce {
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .emoji-result {
+            font-size: 1.2em;
+        }
+
+        .funny-mode-active .calculator-container {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+        }
+
+        .funny-mode-active .title {
+            animation: rainbow 2s linear infinite;
+        }
+
+        @keyframes rainbow {
+            0% { color: #ff6b6b; }
+            25% { color: #ffa500; }
+            50% { color: #4ecdc4; }
+            75% { color: #9b59b6; }
+            100% { color: #ff6b6b; }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container" id="calculatorContainer">
+        <div class="header">
+            <h1 class="title">🤪 Funny Calculator 🤪</h1>
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="normalMode">Normal Mode</button>
+                <button class="mode-btn" id="funnyMode">Funny Mode</button>
+            </div>
+        </div>
+
+        <div class="display" id="display">0</div>
+        <div class="result-comment" id="resultComment"></div>
+
+        <div class="buttons-grid">
+            <button class="btn clear" onclick="clearDisplay()">C</button>
+            <button class="btn" onclick="appendToDisplay('(')">(</button>
+            <button class="btn" onclick="appendToDisplay(')')">)</button>
+            <button class="btn operator" onclick="appendToDisplay('/')">÷</button>
+            
+            <button class="btn" onclick="appendToDisplay('7')">7</button>
+            <button class="btn" onclick="appendToDisplay('8')">8</button>
+            <button class="btn" onclick="appendToDisplay('9')">9</button>
+            <button class="btn operator" onclick="appendToDisplay('*')">×</button>
+            
+            <button class="btn" onclick="appendToDisplay('4')">4</button>
+            <button class="btn" onclick="appendToDisplay('5')">5</button>
+            <button class="btn" onclick="appendToDisplay('6')">6</button>
+            <button class="btn operator" onclick="appendToDisplay('-')">-</button>
+            
+            <button class="btn" onclick="appendToDisplay('1')">1</button>
+            <button class="btn" onclick="appendToDisplay('2')">2</button>
+            <button class="btn" onclick="appendToDisplay('3')">3</button>
+            <button class="btn operator" onclick="appendToDisplay('+')">+</button>
+            
+            <button class="btn" onclick="appendToDisplay('0')">0</button>
+            <button class="btn" onclick="appendToDisplay('.')">.</button>
+            <button class="btn equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'normal';
+        let displayValue = '0';
+        let lastResult = '';
+
+        // Funny comments
+        const funnyComments = [
+            "Wow, you're a math genius! 🧠✨",
+            "This answer is sponsored by coffee ☕",
+            "Math is like pizza - it's always a good idea! 🍕",
+            "Your calculator skills are off the charts! 📈",
+            "This calculation was powered by pure awesomeness! ⚡",
+            "Math + You = Pure Magic! ✨",
+            "You're making numbers look good! 🔢💫",
+            "This result is 100% certified funny! 😄",
+            "Numbers fear your power! 💪",
+            "You're the hero math deserves! 🦸‍♂️",
+            "I did the math... twice! Just to be sure! 🤓",
+            "This result is so good, it should be in a museum! 🏛️",
+            "Math + You = Pure Comedy Gold! 🥇",
+            "You're the reason calculators have a sense of humor! 😂",
+            "Math fact: You're amazing! (That's not a fact, but it's true!) 💫",
+            "Warning: May cause spontaneous dancing! 💃🕺",
+            "Brought to you by the Department of Silly Math! 🎪",
+            "Math fact: This is definitely a number! 🔢",
+            "I calculated this with my left brain tied behind my back! 🧠",
+            "This answer has been certified by the Math Police! 👮‍♂️",
+            "Math + Coffee = Pure Genius! ☕🧠",
+            "You're so good at math, even calculators take notes! 📝",
+            "This calculation was powered by pure imagination! ✨",
+            "Math is like a box of chocolates - you never know what you'll get! 🍫",
+            "You're making math look easy! (It's not, you're just awesome!) 😎"
+        ];
+
+        const angryMessages = [
+            "Stop breaking me! Division by zero is illegal! 😠",
+            "You can't divide by zero! That's like trying to eat a rainbow! 🌈",
+            "Error 404: Common sense not found! 🤦‍♂️",
+            "My circuits are crying! 😭",
+            "That's not how math works! 🤯",
+            "Division by zero? Are you trying to break the universe? 🌌",
+            "My mathematical heart can't take this! 💔",
+            "Error: User needs a math lesson! 📚",
+            "Division by zero is like trying to split a unicorn! 🦄",
+            "You're making my calculator cry! 😢",
+            "This is mathematically impossible! (And I'm a calculator!) 🤖",
+            "You can't divide by zero! That's like trying to catch a cloud! ☁️",
+            "My circuits are having an existential crisis! 🤯",
+            "Division by zero? That's like trying to fold a circle! 🔴",
+            "You're breaking the laws of mathematics! ⚖️"
+        ];
+
+        const easterEggs = {
+            '69': "Nice! 😏 You found the legendary number!",
+            '420': "Blaze it! 🌿 Mathematical enlightenment achieved!",
+            '007': "License to calculate! 🕴️ Agent 007 approves this math!",
+            '42': "The answer to life, the universe, and everything! 🌌",
+            '404': "Error: Joke not found! 😅",
+            '1337': "Leet! You're a hacker now! 💻",
+            '80085': "Boobs! 😂 (I'm a calculator, not a child!)",
+            '12345': "That's the same combination as my luggage! 🧳",
+            '8675309': "Jenny, I got your number! 📞",
+            '999': "Emergency! Emergency! 🚨",
+            '777': "Jackpot! 🎰 Lucky you!",
+            '666': "The number of the beast! 😈",
+            '911': "Emergency services! 🚓🚑🚒",
+            '555': "Fake number! (Like in movies!) 🎬",
+            '123': "The most common password! 🔑 (Don't use this!)",
+            '321': "Counting backwards! 🔢",
+            '111': "Binary is calling! 💻",
+            '222': "Double trouble! 😈😈",
+            '333': "Triple threat! 💪💪💪",
+            '444': "Four-leaf clover! 🍀",
+            '888': "Infinity symbol! ♾️",
+            '1000': "One thousand! That's a lot! 📊",
+            '2024': "This year! 🎉",
+            '314': "Pi! 🥧 (Well, close enough!)",
+            '271': "E! 📧 (Mathematical constant!)",
+            '161': "Golden ratio! 📐 (Approximately!)",
+            '100': "Century! 🎯",
+            '50': "Halfway there! 🎯",
+            '25': "Quarter! 🥧",
+            '10': "Perfect ten! 🔟",
+            '1': "The loneliest number! 😢",
+            '0': "Nothing! (But you're still awesome!) 💫"
+        };
+
+        const emojiNumbers = ['🍕', '🍔', '🍦', '🍩', '🍪', '🍭', '🍫', '🍬', '🍡', '🍰'];
+
+        const mathPuns = [
+            "Why was the math book sad? Because it had too many problems! 😢",
+            "What do you call a number that can't keep still? A roamin' numeral! 🏃‍♂️",
+            "Why did the obtuse angle go to the beach? Because it was over 90 degrees! 🏖️",
+            "What's a math teacher's favorite dessert? Pi! 🥧",
+            "Why did the math student go to the doctor? Because he had acute angle! 🏥"
+        ];
+
+        const sillyMathFacts = [
+            "Did you know? Math is the only language that's universal! 🌍",
+            "Fun fact: Zero is both even and nothing! 🤯",
+            "Math fact: Pi goes on forever! (Just like this joke!) ♾️",
+            "Did you know? Numbers are just letters that got lazy! 🔢"
+        ];
+
+        const mathRiddles = [
+            "What has keys, but no locks; space, but no room; and you can enter, but not go in? A keyboard! ⌨️",
+            "What gets wetter and wetter the more it dries? A towel! 🧺",
+            "What has a head and a tail but no body? A coin! 🪙",
+            "What comes once in a minute, twice in a moment, but never in a thousand years? The letter 'M'! 🔤"
+        ];
+
+        // Mode switching
+        document.getElementById('normalMode').addEventListener('click', () => switchMode('normal'));
+        document.getElementById('funnyMode').addEventListener('click', () => switchMode('funny'));
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('normalMode').classList.toggle('active', mode === 'normal');
+            document.getElementById('funnyMode').classList.toggle('active', mode === 'funny');
+            document.body.classList.toggle('funny-mode-active', mode === 'funny');
+
+            document.getElementById('calculatorContainer').classList.add('bounce');
+            setTimeout(() => {
+                document.getElementById('calculatorContainer').classList.remove('bounce');
+            }, 600);
+        }
+
+        // Fixed: Now accepts event
+        function appendToDisplay(value, element) {
+            if (displayValue === '0' && value !== '.') {
+                displayValue = value;
+            } else {
+                displayValue += value;
+            }
+            updateDisplay();
+
+            // Animate the passed button or find one via data later
+            if (element) {
+                element.classList.add('shake');
+                setTimeout(() => element.classList.remove('shake'), 500);
+            }
+        }
+
+        // Update all buttons to pass 'this'
+        document.querySelectorAll('.btn:not(.equals):not(.clear)').forEach(btn => {
+            const val = btn.textContent.trim();
+            if (val === '÷') btn.onclick = () => appendToDisplay('/', btn);
+            else if (val === '×') btn.onclick = () => appendToDisplay('*', btn);
+            else btn.onclick = () => appendToDisplay(val, btn);
+        });
+
+        // Special cases
+        document.querySelector('.clear').onclick = clearDisplay;
+
+        function clearDisplay() {
+            displayValue = '0';
+            updateDisplay();
+            hideComment();
+            document.getElementById('display').classList.add('bounce');
+            setTimeout(() => document.getElementById('display').classList.remove('bounce'), 600);
+        }
+
+        function updateDisplay() {
+            document.getElementById('display').textContent = displayValue;
+        }
+
+        function showComment(comment) {
+            const el = document.getElementById('resultComment');
+            el.textContent = comment;
+            el.style.display = 'block';
+        }
+
+        function hideComment() {
+            document.getElementById('resultComment').style.display = 'none';
+        }
+
+        function getRandomComment() {
+            const random = Math.random();
+            if (random < 0.5) return funnyComments[Math.floor(Math.random() * funnyComments.length)];
+            if (random < 0.7) return mathPuns[Math.floor(Math.random() * mathPuns.length)];
+            if (random < 0.9) return sillyMathFacts[Math.floor(Math.random() * sillyMathFacts.length)];
+            return mathRiddles[Math.floor(Math.random() * mathRiddles.length)];
+        }
+
+        function getRandomAngryMessage() {
+            return angryMessages[Math.floor(Math.random() * angryMessages.length)];
+        }
+
+        function checkEasterEggs(result) {
+            const resultStr = result.toString();
+            for (const [key, message] of Object.entries(easterEggs)) {
+                if (resultStr.includes(key)) return message;
+            }
+            return null;
+        }
+
+        function getEmojiResult(result) {
+            if (currentMode === 'funny' && Math.random() < 0.3) {
+                const num = Math.abs(Math.floor(result));
+                if (num >= 1 && num <= 10) return emojiNumbers[num - 1];
+            }
+            return result;
+        }
+
+        function getFunnyResult(realResult) {
+            if (currentMode !== 'funny') return realResult;
+
+            if (Math.random() < 0.2) {
+                const sillyUnits = ["pizzas 🍕", "unicorns 🦄", "tacos 🌮", "rainbows 🌈", "memes 😂", "robots 🤖", "aliens 👽"];
+                return `${realResult} ${sillyUnits[Math.floor(Math.random() * sillyUnits.length)]}`;
+            }
+
+            if (Math.random() < 0.05) {
+                const randomJokes = [
+                    "The answer is... yes! 🤷‍♂️",
+                    "I'm pretty sure it's 42! 🌌",
+                    "Ask your mom! 👩‍👧‍👦",
+                    "The answer is in the question! 🤔"
+                ];
+                return randomJokes[Math.floor(Math.random() * randomJokes.length)];
+            }
+
+            if (Math.random() < 0.02) {
+                const surprises = [
+                    "🎉 SURPRISE! The answer is... CHICKEN! 🐔",
+                    "🤯 MIND BLOWN! The answer is... UNICORN! 🦄",
+                    "🚀 SPACE ANSWER! The answer is... INFINITY! ♾️",
+                    "🧙‍♂️ WIZARD ANSWER! The answer is... MAGIC! ✨"
+                ];
+                return surprises[Math.floor(Math.random() * surprises.length)];
+            }
+
+            return realResult;
+        }
+
+        function calculate() {
+            try {
+                // Prevent eval of unsafe/incomplete expressions
+                if (!/^[0-9+\-*/(). ]+$/.test(displayValue)) throw new Error("Invalid chars");
+
+                // Check division by zero
+                if (/\//.test(displayValue) && /\/0(?:\.0*)?(?:[+\-*/()]|$)/.test(displayValue)) {
+                    if (currentMode === 'funny') {
+                        showComment(getRandomAngryMessage());
+                        document.getElementById('display').classList.add('shake');
+                        setTimeout(() => document.getElementById('display').classList.remove('shake'), 500);
+                    } else {
+                        showComment("Error: Division by zero");
+                    }
+                    return;
+                }
+
+                let result = Function('"use strict"; return (' + displayValue + ')')();
+
+                // Easter egg?
+                const easterEgg = checkEasterEggs(result);
+                if (easterEgg && currentMode === 'funny') {
+                    showComment(easterEgg);
+                } else if (currentMode === 'funny') {
+                    showComment(getRandomComment());
+                }
+
+                let displayResult = getFunnyResult(result);
+                displayResult = getEmojiResult(displayResult);
+
+                displayValue = displayResult.toString();
+                updateDisplay();
+                lastResult = result;
+
+                document.getElementById('display').classList.add('bounce');
+                setTimeout(() => document.getElementById('display').classList.remove('bounce'), 600);
+
+            } catch (error) {
+                const errorMsg = currentMode === 'funny'
+                    ? "Oops! Something went wrong. Maybe try some simpler math? 😅"
+                    : "Error: Invalid expression";
+                showComment(errorMsg);
+                document.getElementById('display').classList.add('shake');
+                setTimeout(() => document.getElementById('display').classList.remove('shake'), 500);
+            }
+        }
+
+        // Keyboard support with visual feedback
+        document.addEventListener('keydown', (e) => {
+            const key = e.key;
+            const btnMap = {
+                '0': '0', '1': '1', '2': '2', '3': '3', '4': '4',
+                '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
+                '.': '.', '+': '+', '-': '-', '*': '*', '/': '/',
+                '(': '(', ')': ')', 'Enter': '=', 'Escape': 'Escape'
+            };
+
+            if (btnMap[key]) {
+                e.preventDefault();
+                const value = btnMap[key];
+                if (value === '=') calculate();
+                else if (value === 'Escape') clearDisplay();
+                else {
+                    appendToDisplay(value);
+                    // Find matching button and animate
+                    const btnText = value === '*' ? '×' : value === '/' ? '÷' : value;
+                    const btn = [...document.querySelectorAll('.btn')].find(b => b.textContent.trim() === btnText);
+                    if (btn) {
+                        btn.classList.add('shake');
+                        setTimeout(() => btn.classList.remove('shake'), 500);
+                    }
+                }
+            }
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kali Pujor Location - Kolkata Pandals</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #8B0000, #DC143C, #FF6347);
+            min-height: 100vh;
+            color: #333;
+            padding-bottom: 60px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            color: #8B0000;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(45deg, #8B0000, #DC143C, #FF6347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .decorative-border {
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            margin: 20px auto;
+            border-radius: 2px;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 14px 20px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .search-input:focus {
+            border-color: #FF6347;
+            box-shadow: 0 0 10px rgba(255, 99, 71, 0.3);
+        }
+
+        .search-btn, .map-toggle, .puja-toggle {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn {
+            background: linear-gradient(45deg, #FF6347, #FF4500);
+            color: white;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 99, 71, 0.4);
+        }
+
+        .map-toggle {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+         .puja-toggle {
+            background: linear-gradient(45deg, #f23303, #fd0101);
+            color: white;
+        }
+
+        .map-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(11, 216, 7, 0.4);
+        }
+        .puja-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(250, 2, 2, 0.4);
+        }
+
+        .puja-toggle a {
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Map Container */
+        .map-container {
+            display: none;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            height: 450px;
+            position: relative;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Pandal Grid */
+        .pandal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .pandal-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            opacity: 1;
+        }
+
+        .pandal-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+        }
+
+        .pandal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            border-color: #FF6347;
+        }
+
+        .pandal-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #8B0000;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pandal-address {
+            color: #666;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.5;
+        }
+
+        .pandal-timing {
+            color: #28a745;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pandal-description {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .pandal-category {
+            color: #8B0000;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding: 6px 12px;
+            background: rgba(139, 0, 0, 0.1);
+            border-radius: 10px;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .crowd-level {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .crowd-very-high {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .crowd-extremely-high {
+            background: linear-gradient(45deg, #8B0000, #A0002A);
+            color: white;
+        }
+
+        .crowd-high {
+            background: linear-gradient(45deg, #fd7e14, #e8590c);
+            color: white;
+        }
+
+        .crowd-moderate {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .key-info {
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2196f3;
+            color: #1565c0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .pandal-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-map {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .btn-map:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .btn-google-map {
+            background: linear-gradient(45deg, #db4437, #c62828);
+            color: white;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .btn-google-map:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(219, 68, 55, 0.4);
+        }
+
+        .special-feature {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #8B0000;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-top: 10px;
+            display: inline-block;
+            border: 1px solid #FFA500;
+        }
+
+        /* Tips Section */
+        .tips-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .tips-section h2 {
+            color: #8B0000;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .tips-section h2::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 2px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.1));
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid #FF6347;
+            transition: all 0.3s ease;
+        }
+
+        .tip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
+        }
+
+        .tip-card h3 {
+            color: #8B0000;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tip-card p {
+            color: #444;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .footer p {
+            margin: 8px 0;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #fff;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .no-results h3 {
+            color: #8B0000;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .no-results p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: 100%;
+            }
+            
+            .pandal-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .map-container {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .pandal-name {
+                font-size: 1.4rem;
+            }
+            
+            .search-btn, .map-toggle {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+            
+            .map-container {
+                height: 300px;
+            }
+        }
+
+        /* Festive animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Map marker styles */
+        .leaflet-popup-content {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .leaflet-popup-content h4 {
+            margin-bottom: 8px;
+            color: #8B0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header floating">
+            <h1>🕉️ Pujor Morsum 🕉️</h1>
+            <div class="decorative-border"></div>
+            <p>Discover the most famous Kali Puja pandals across Kolkata</p>
+            <p><em>Experience the divine festivities and cultural heritage</em></p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search pandals by name, area, or description...">
+                <button onclick="searchPandals()" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <button onclick="toggleMap()" class="map-toggle" id="mapToggleBtn">
+                    <i class="fas fa-map-marked-alt"></i> Show Map
+                </button>
+                <button class="puja-toggle">
+                     <a href="webp2-3.html">Durga Puja View</a>
+                </button>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-container" id="mapContainer">
+            <div id="map"></div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading pandals...</p>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <h3><i class="fas fa-exclamation-circle"></i> No pandals found</h3>
+            <p>Try searching with different keywords or check back later for more pandals.</p>
+        </div>
+
+        <!-- Pandal Grid -->
+        <div class="pandal-grid" id="pandalGrid"></div>
+
+        <!-- Visitor Tips Section -->
+        <div class="tips-section">
+            <h2>🎯 Tips for Visiting Kali Puja Pandals</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h3><i class="fas fa-clock"></i> Best Timing</h3>
+                    <p>The best nights to visit are on <strong>Kali Puja evening</strong> (the main night) and <strong>Bhai Dooj</strong> (the following night). The crowds are largest between <strong>9:00 PM and 1:00 AM</strong>.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-subway"></i> Transport</h3>
+                    <p>Avoid private cars as roads are blocked. The <strong>Kolkata Metro</strong> is the best way to travel. Use app-based taxis or autos for last-mile connectivity.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-lock"></i> Safety</h3>
+                    <p>Keep your valuables secure in crowded places. Carry minimal cash and avoid wearing expensive jewelry during visits.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-map-marker-alt"></i> Local Guides</h3>
+                    <p>Don't hesitate to ask locals for directions. Kolkatans are very helpful during the puja season and love sharing their cultural knowledge.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-mobile-alt"></i> Stay Connected</h3>
+                    <p>Keep your phone charged and share your location with family. Download offline maps in case of network congestion.</p>
+                </div>
+                <div class="tip-card">
+                    <h3><i class="fas fa-utensils"></i> Food & Water</h3>
+                    <p>Stay hydrated and try traditional Bengali sweets available at pandals. Street food is abundant but choose clean vendors.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2025 Kali Pujor Location | Celebrating the divine spirit of Maa Kali</p>
+            <p>🙏 May Maa Kali bless us all 🙏</p>
+            <p>Developed by Biltu Kundu</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script>
+        // Updated Kali Puja Pandals Data with all 49 locations
+        const pandalData = [
+            {
+                id: 1,
+                name: "Bara Bazar Sarbojanin Durgotsav & Kali Puja",
+                address: "13/1, Ramdulal Sarkar Street, Bara Bazar, Kolkata - 700009",
+                timing: "6:00 AM - 12:00 AM (Extended during Kali Puja)",
+                description: "A traditional community puja in the heart of old Kolkata. Known for its authentic Bengali rituals and vibrant atmosphere. The pandal is beautifully decorated with traditional motifs and the idol is crafted by renowned artisans from Kumartuli.",
+                latitude: 22.5896,
+                longitude: 88.3556,
+                specialFeature: "Traditional Community Puja",
+                area: "Bara Bazar",
+                keyInfo: "Authentic Bengali rituals in the heart of old Kolkata",
+                crowdLevel: "Very High",
+                category: "Traditional Community"
+            },
+            {
+                id: 2,
+                name: "College Street Sarbojanin Kali Puja",
+                address: "College Street, Near Coffee House, Kolkata - 700073",
+                timing: "6:00 AM - 11:00 PM",
+                description: "Located in the literary hub of Kolkata, this puja attracts intellectuals and book lovers. The pandal often features themes related to literature, education, and Bengali cultural heritage. A unique blend of spirituality and intellectualism.",
+                latitude: 22.5726,
+                longitude: 88.3639,
+                specialFeature: "Literary & Cultural Hub",
+                area: "College Street",
+                keyInfo: "Intellectual atmosphere with literary themes",
+                crowdLevel: "High",
+                category: "Cultural & Literary"
+            },
+            {
+                id: 3,
+                name: "Gariahat Sarbojanin Kali Puja",
+                address: "Gariahat Road, Near Deshapriya Park, Kolkata - 700029",
+                timing: "6:00 AM - 12:00 AM",
+                description: "A popular South Kolkata community puja known for its grand decorations and innovative themes. The location near Deshapriya Park makes it easily accessible and a favorite among families. The pandal is beautifully lit with traditional and modern lighting.",
+                latitude: 22.5276,
+                longitude: 88.3724,
+                specialFeature: "South Kolkata Community Favorite",
+                area: "Gariahat",
+                keyInfo: "Grand decorations near Deshapriya Park",
+                crowdLevel: "Very High",
+                category: "Community Celebration"
+            },
+            {
+                id: 4,
+                name: "Lake Market Kali Puja",
+                address: "Lake Market, Rash Behari Avenue, Kolkata - 700029",
+                timing: "6:00 AM - 11:00 PM",
+                description: "Celebrated in the heart of South Kolkata's shopping district, this puja combines spirituality with the vibrant market atmosphere. The pandal is known for its elegant design and attracts both shoppers and devotees alike.",
+                latitude: 22.5276,
+                longitude: 88.3639,
+                specialFeature: "Shopping Hub Celebration",
+                area: "Lake Market",
+                keyInfo: "Spiritual celebration in a bustling market area",
+                crowdLevel: "High",
+                category: "Urban Celebration"
+            },
+            {
+                id: 5,
+                name: "Park Circus 7 Point Crossing Kali Puja",
+                address: "Park Circus 7 Point Crossing, Park Circus, Kolkata - 700017",
+                timing: "6:00 AM - 12:00 AM",
+                description: "One of the most innovative pujas in Kolkata, known for its thematic pandals that often address social issues or replicate famous landmarks. The central location makes it easily accessible from all parts of the city.",
+                latitude: 22.5476,
+                longitude: 88.3724,
+                specialFeature: "Innovative Themes",
+                area: "Park Circus",
+                keyInfo: "Thematic pandals addressing social issues",
+                crowdLevel: "Very High",
+                category: "Innovative & Thematic"
+            },
+            {
+                id: 6,
+                name: "Ballygunge Circular Road Kali Puja",
+                address: "1A, Ballygunge Circular Road, Near Hindustan Park, Kolkata - 700019",
+                timing: "6:00 AM - 11:00 PM",
+                description: "An elegant community celebration in one of Kolkata's most upscale neighborhoods. Known for its sophisticated crowd and beautifully crafted idols. The pandal maintains a perfect balance between tradition and modern aesthetics.",
+                latitude: 22.5276,
+                longitude: 88.3639,
+                specialFeature: "Elegant Community Celebration",
+                area: "Ballygunge",
+                keyInfo: "Sophisticated celebration in upscale neighborhood",
+                crowdLevel: "High",
+                category: "Upscale Community"
+            },
+            {
+                id: 7,
+                name: "New Alipore Sarbojanin Kali Puja",
+                address: "36A, Diamond Harbour Road, New Alipore, Kolkata - 700053",
+                timing: "6:00 AM - 11:00 PM",
+                description: "A well-organized puja in South Kolkata's residential area. Known for its family-friendly atmosphere and traditional celebrations. The pandal is beautifully decorated with flowers and lights, creating a serene environment for devotees.",
+                latitude: 22.4953,
+                longitude: 88.3276,
+                specialFeature: "Upscale Community Puja",
+                area: "New Alipore",
+                keyInfo: "Family-friendly traditional celebration",
+                crowdLevel: "Moderate",
+                category: "Residential Community"
+            },
+            {
+                id: 8,
+                name: "Behala Chatterjee Para Kali Puja",
+                address: "Behala Chatterjee Para, Behala, Kolkata - 700060",
+                timing: "6:00 AM - 10:30 PM",
+                description: "A traditional community puja in South Kolkata's Behala area. Known for its authentic Bengali rituals and strong community participation. The pandal maintains the old-world charm of neighborhood pujas with heartfelt devotion.",
+                latitude: 22.4953,
+                longitude: 88.3276,
+                specialFeature: "Traditional Behala Community",
+                area: "Behala",
+                keyInfo: "Authentic neighborhood puja with strong community bonds",
+                crowdLevel: "High",
+                category: "Traditional Community"
+            },
+            {
+                id: 9,
+                name: "Tollygunge Club Kali Puja",
+                address: "Tollygunge Club, 37A, Deshapran Sashmal Road, Tollygunge, Kolkata - 700033",
+                timing: "6:00 AM - 11:00 PM",
+                description: "Celebrated at the historic Tollygunge Club, this puja combines heritage with spirituality. The club's colonial architecture provides a unique backdrop for the celebrations, attracting both members and the general public.",
+                latitude: 22.4953,
+                longitude: 88.3276,
+                specialFeature: "Club Heritage Celebration",
+                area: "Tollygunge",
+                keyInfo: "Spiritual celebration in historic colonial club",
+                crowdLevel: "Moderate",
+                category: "Heritage Celebration"
+            },
+            {
+                id: 10,
+                name: "Lake Gardens Sarbojanin Kali Puja",
+                address: "Lake Gardens, Prince Anwar Shah Road, Kolkata - 700045",
+                timing: "6:00 AM - 11:00 PM",
+                description: "Set in the serene Lake Gardens area, this puja offers a peaceful spiritual experience away from the city's chaos. The pandal is beautifully decorated with natural elements and flowers, creating a tranquil atmosphere.",
+                latitude: 22.4953,
+                longitude: 88.3832,
+                specialFeature: "Serene Garden Setting",
+                area: "Lake Gardens",
+                keyInfo: "Peaceful celebration in garden surroundings",
+                crowdLevel: "Moderate",
+                category: "Serene Celebration"
+            },
+            {
+                id: 11,
+                name: "Jodhpur Park Boys Club Kali Puja",
+                address: "Jodhpur Park Boys Club, 63A, Deshapran Sashmal Road, Jodhpur Park, Kolkata - 700068",
+                timing: "6:00 AM - 11:00 PM",
+                description: "A youth-led celebration that brings energy and innovation to traditional rituals. The pandal often features contemporary themes and attracts a younger crowd while maintaining the essence of Kali Puja.",
+                latitude: 22.4953,
+                longitude: 88.3832,
+                specialFeature: "Youth-Led Celebration",
+                area: "Jodhpur Park",
+                keyInfo: "Energetic celebration led by young community members",
+                crowdLevel: "High",
+                category: "Youth Celebration"
+            },
+            {
+                id: 12,
+                name: "South Sinthi Cultural Association Kali Puja",
+                address: "South Sinthi, Near Sinthi More, Kolkata - 700056",
+                timing: "6:00 AM - 11:00 PM",
+                description: "A cultural hub in North Kolkata that celebrates Kali Puja with artistic excellence. The pandal is known for its intricate designs and cultural programs that showcase Bengali heritage throughout the festival.",
+                latitude: 22.6089,
+                longitude: 88.3724,
+                specialFeature: "North Kolkata Cultural Hub",
+                area: "South Sinthi",
+                keyInfo: "Artistic excellence with cultural programs",
+                crowdLevel: "High",
+                category: "Cultural Association"
+            },
+            {
+                id: 13,
+                name: "Kakurgachi Shyampukur Sarbojanin Kali Puja",
+                address: "Kakurgachi, Shyampukur Road, Kolkata - 700054",
+                timing: "6:00 AM - 10:30 PM",
+                description: "A traditional Bengali community puja that preserves the authentic rituals and customs of Kali Puja. The pandal is beautifully decorated with traditional motifs and the idol is crafted with great devotion.",
+                latitude: 22.6089,
+                longitude: 88.3724,
+                specialFeature: "Traditional Bengali Culture",
+                area: "Kakurgachi",
+                keyInfo: "Preservation of authentic Bengali Kali Puja traditions",
+                crowdLevel: "High",
+                category: "Traditional Heritage"
+            },
+            {
+                id: 14,
+                name: "Dum Dum Park Kali Puja",
+                address: "Dum Dum Park, Jessore Road, Kolkata - 700055",
+                timing: "6:00 AM - 11:00 PM",
+                description: "A grand celebration in North Kolkata known for its massive pandal and elaborate decorations. The location near Dum Dum Park makes it a popular destination for families and groups during the festival.",
+                latitude: 22.6089,
+                longitude: 88.4225,
+                specialFeature: "North Kolkata Grand Celebration",
+                area: "Dum Dum Park",
+                keyInfo: "Massive pandal near Dum Dum Park",
+                crowdLevel: "Very High",
+                category: "Grand Celebration"
+            },
+            {
+                id: 15,
+                name: "Rajarhat New Town Action Area I Kali Puja",
+                address: "Action Area I, New Town, Rajarhat, Kolkata - 700156",
+                timing: "6:00 AM - 11:00 PM",
+                description: "A modern community celebration in Kolkata's new township. The pandal combines contemporary design with traditional elements, reflecting the spirit of new Kolkata while honoring age-old traditions.",
+                latitude: 22.6089,
+                longitude: 88.4225,
+                specialFeature: "Modern Community Celebration",
+                area: "Rajarhat New Town",
+                keyInfo: "Contemporary celebration in new township",
+                crowdLevel: "Moderate",
+                category: "Modern Community"
+            },
+            {
+                id: 16,
+                name: "Shyambazar Shyampukur Sarbojanin Kali Puja",
+                address: "102/1, APC Road, Shyambazar, Kolkata - 700004",
+                timing: "6:00 AM - 11:00 PM",
+                description: "A heritage community puja in North Kolkata's historic Shyambazar area. Known for its traditional rituals and strong community participation. The pandal maintains the old-world charm of neighborhood celebrations.",
+                latitude: 22.6089,
+                longitude: 88.3724,
+                specialFeature: "Heritage Community Puja",
+                area: "Shyambazar",
+                keyInfo: "Traditional celebration in historic North Kolkata",
+                crowdLevel: "High",
+                category: "Heritage Community"
+            },
+            {
+                id: 17,
+                name: "Manicktala Chamatkarini Kali Puja",
+                address: "Manicktala Main Road, Near Manicktala Crossing, Kolkata - 700054",
+                timing: "6:00 AM - 10:30 PM",
+                description: "Celebrated at the historic Chamatkarini Kali Temple, this puja has deep spiritual significance. The temple is believed to be miraculous, and the celebrations attract devotees from all over the city seeking blessings.",
+                latitude: 22.6089,
+                longitude: 88.3724,
+                specialFeature: "Miraculous Temple Heritage",
+                area: "Manicktala",
+                keyInfo: "Spiritual celebration at historic miraculous temple",
+                crowdLevel: "Very High",
+                category: "Temple Heritage"
+            },
+            {
+                id: 18,
+                name: "Kankurgachi Vidyapith Kali Puja",
+                address: "Kankurgachi Vidyapith, 37A, Kankurgachi Road, Kolkata - 700054",
+                timing: "6:00 AM - 10:30 PM",
+                description: "Organized by an educational institution, this puja combines academic excellence with spiritual devotion. The pandal often features educational themes and attracts students, teachers, and families from the community.",
+                latitude: 22.6089,
+                longitude: 88.3724,
+                specialFeature: "Educational Institution Celebration",
+                area: "Kankurgachi",
+                keyInfo: "Academic community celebration with educational themes",
+                crowdLevel: "Moderate",
+                category: "Educational Celebration"
+            },
+            {
+                id: 19,
+                name: "Baghbazar Sarbojanin Kali Puja",
+                address: "14/2, Baghbazar Street, Baghbazar, Kolkata - 700003",
+                timing: "6:00 AM - 11:00 PM",
+                description: "One of the oldest community pujas in Kolkata, located in the historic Baghbazar area. Known for its traditional rituals and authentic Bengali atmosphere. The pandal preserves the heritage of old Kolkata celebrations.",
+                latitude: 22.6089,
+                longitude: 88.3724,
+                specialFeature: "Historic Old Kolkata Heritage",
+                area: "Baghbazar",
+                keyInfo: "One of Kolkata's oldest community pujas",
+                crowdLevel: "High",
+                category: "Historic Heritage"
+            },
+            {
+                id: 20,
+                name: "Kumortuli Sarbojanin Kali Puja",
+                address: "51/1, Rabindra Sarani, Kumartuli, Kolkata - 700005",
+                timing: "6:00 AM - 11:00 PM",
+                description: "Celebrated in the heart of Kolkata's artisan quarter, this puja features idols crafted by the legendary potters of Kumartuli. The pandal showcases the artistic excellence of local artisans and offers a unique cultural experience.",
+                latitude: 22.6089,
+                longitude: 88.3724,
+                specialFeature: "Artisan Quarter Heritage",
+                area: "Kumartuli",
+                keyInfo: "Idols crafted by legendary Kumartuli artisans",
+                crowdLevel: "High",
+                category: "Artisan Heritage"
+            },
+    {
+        id: 21,
+        name: "Chetla Agrani Club Kali Puja",
+        address: "Chetla Road, Near Chetla Park, Kolkata - 700027",
+        timing: "6:00 AM - 1:00 AM (Extended due to high footfall)",
+        description: "One of the most artistic and famous pujas in South Kolkata. Known for setting high standards in thematic pandal construction and idol design. It attracts massive crowds and is a must-visit for thematic creativity.",
+        latitude: 22.5276,
+        longitude: 88.3320,
+        specialFeature: "Highly Artistic & Thematic Pandal",
+        area: "Chetla",
+        keyInfo: "Major crowd puller known for contemporary art installations",
+        crowdLevel: "Very High",
+        category: "Innovative & Thematic"
+    },
+    {
+        id: 22,
+        name: "Naktala Udayan Sangha Kali Puja",
+        address: "Naktala Main Road, Naktala, Kolkata - 700047",
+        timing: "6:00 AM - 11:30 PM",
+        description: "This puja is celebrated in the southern outskirts of the city and is famous for its elaborate budget and impressive thematic presentation. It has gained recognition over the years for its grandeur and unique design elements.",
+        latitude: 22.4760,
+        longitude: 88.3751,
+        specialFeature: "Grand Scale & Elaborate Themes",
+        area: "Naktala",
+        keyInfo: "Known for large, impressive scale and detailed artwork",
+        crowdLevel: "High",
+        category: "Grand Celebration"
+    },
+    {
+        id: 23,
+        name: "Mudiali Club Sarbojanin Kali Puja",
+        address: "Mudiali, Near Rashbehari Avenue, Kolkata - 700029",
+        timing: "6:00 AM - 12:00 AM",
+        description: "Located near the Rabindra Sarobar area, Mudiali Club hosts a popular puja known for its combination of modern execution and traditional Bengali aesthetics. The lighting arrangements are typically exceptional.",
+        latitude: 22.5186,
+        longitude: 88.3582,
+        specialFeature: "Traditional Aesthetics & Lighting",
+        area: "Mudiali/Kalighat",
+        keyInfo: "Elegant celebration near Rabindra Sarobar",
+        crowdLevel: "Very High",
+        category: "Community Celebration"
+    },
+    {
+        id: 24,
+        name: "Shibmandir Sarbojanin Kali Puja",
+        address: "Shibmandir Road, Jodhpur Park, Kolkata - 700068",
+        timing: "6:00 AM - 11:00 PM",
+        description: "A well-regarded South Kolkata puja recognized for its creative approach to the goddess’s idol and pandal architecture. It offers a sophisticated viewing experience, blending spiritual reverence with artistic flair.",
+        latitude: 22.4988,
+        longitude: 88.3840,
+        specialFeature: "Creative Idol Design",
+        area: "Shibmandir",
+        keyInfo: "Artistic presentation in a busy residential hub",
+        crowdLevel: "High",
+        category: "Artistic & Creative"
+    },
+    {
+        id: 25,
+        name: "Sreebhumi Sporting Club Kali Puja",
+        address: "P-45, VIP Road, Near Lake Town, Kolkata - 700089",
+        timing: "6:00 AM - 1:00 AM",
+        description: "While globally famous for Durga Puja, Sreebhumi also hosts a grand Kali Puja. It is known for its massive scale, lavish decorations, and often spectacular replicas of famous national or international landmarks for the pandal structure.",
+        latitude: 22.5896,
+        longitude: 88.4239,
+        specialFeature: "Mega Pandal & Lavish Decorations",
+        area: "Lake Town",
+        keyInfo: "One of the most spectacular and crowded pujas",
+        crowdLevel: "Very High",
+        category: "Grand Celebration"
+    },
+    {
+        id: 26,
+        name: "Kalighat Milan Sangha Kali Puja",
+        address: "Kalighat Road, Near Kalighat Temple, Kolkata - 700026",
+        timing: "5:00 AM - 1:00 AM",
+        description: "Set near the historic Kali Temple, this community puja embodies the spiritual fervor of the area. It focuses heavily on strict traditional rituals and attracts deep devotees alongside general visitors.",
+        latitude: 22.5154,
+        longitude: 88.3508,
+        specialFeature: "Proximity to Historic Temple",
+        area: "Kalighat",
+        keyInfo: "Intense spiritual focus adjacent to the main Kali Temple",
+        crowdLevel: "Very High",
+        category: "Spiritual Heritage"
+    },
+    {
+        id: 27,
+        name: "Tridhara Sammilani Kali Puja",
+        address: "Manoharpukur Road, Baliganj, Kolkata - 700029",
+        timing: "6:00 AM - 11:30 PM",
+        description: "A major South Kolkata puja famous for its innovative use of materials and complex artistic themes. Tridhara often wins awards for its execution and creative depth, attracting a significant intellectual and art-loving audience.",
+        latitude: 22.5204,
+        longitude: 88.3681,
+        specialFeature: "Innovative Art & Material Use",
+        area: "Baliganj",
+        keyInfo: "High artistic value and creative themes",
+        crowdLevel: "High",
+        category: "Innovative & Artistic"
+    },
+    {
+        id: 28,
+        name: "Hatibagan Nabin Pally Kali Puja",
+        address: "Hatibagan Main Road, North Kolkata - 700006",
+        timing: "6:00 AM - 11:00 PM",
+        description: "A quintessential North Kolkata celebration in the famous Hatibagan shopping district. This puja preserves traditional Bengali rituals and is known for its warm, community-centric atmosphere amidst the bustling market.",
+        latitude: 22.5976,
+        longitude: 88.3724,
+        specialFeature: "Historic North Kolkata Tradition",
+        area: "Hatibagan",
+        keyInfo: "Traditional puja in a vibrant shopping area",
+        crowdLevel: "High",
+        category: "Historic Community"
+    },
+    {
+        id: 29,
+        name: "Santoshpur Lake Pally Kali Puja",
+        address: "Santoshpur Lake Pally, Santoshpur, Kolkata - 700075",
+        timing: "6:00 AM - 10:30 PM",
+        description: "A popular, well-organized community puja in the eastern part of South Kolkata. It offers a slightly less hectic crowd experience compared to central locations, focusing on community engagement and beautiful, traditional pandal lighting.",
+        latitude: 22.4851,
+        longitude: 88.3887,
+        specialFeature: "Organized Community Celebration",
+        area: "Santoshpur",
+        keyInfo: "Peaceful celebration with focus on community participation",
+        crowdLevel: "Moderate",
+        category: "Residential Community"
+    },
+{
+    id: 30,
+    name: "Chetla Bohumukhi Kali Puja",
+    address: "Bohumukhi Lane, Chetla, Kolkata - 700027",
+    timing: "6:00 AM – 12:00 AM",
+    description: "A deeply traditional and spiritually intense puja in the heart of Chetla. Known for its authentic tantric rituals and midnight aarti that draws large crowds of devotees.",
+    latitude: 22.5280,
+    longitude: 88.3310,
+    specialFeature: "Tantric Rituals & Midnight Aarti",
+    area: "Chetla",
+    keyInfo: "Authentic tantric Kali Puja with midnight rituals",
+    crowdLevel: "High",
+    category: "Traditional & Spiritual"
+},
+{
+    id: 31,
+    name: "Bhowanipore Club Kali Puja",
+    address: "Bhowanipore Club, 10A, Lansdowne Road, Kolkata - 700020",
+    timing: "6:00 AM – 11:00 PM",
+    description: "Held at one of Kolkata’s oldest social clubs, this puja blends colonial-era elegance with traditional Bengali devotion. The serene ambiance and classic decor attract an upscale crowd.",
+    latitude: 22.5190,
+    longitude: 88.3520,
+    specialFeature: "Colonial Club Setting",
+    area: "Bhowanipore",
+    keyInfo: "Elegant celebration in a historic South Kolkata club",
+    crowdLevel: "Moderate",
+    category: "Heritage & Upscale"
+},
+{
+    id: 32,
+    name: "Tiljala Adhibasi Brindo Kali Puja",
+    address: "Tiljala, Near Science City, Kolkata - 700039",
+    timing: "6:00 AM – 11:00 PM",
+    description: "A community-driven puja known for its grassroots organization and strong local participation. The pandal often highlights indigenous art and eco-friendly materials.",
+    latitude: 22.5350,
+    longitude: 88.3950,
+    specialFeature: "Eco-Friendly & Indigenous Art",
+    area: "Tiljala",
+    keyInfo: "Community-focused with sustainable themes",
+    crowdLevel: "Moderate",
+    category: "Eco-Conscious Community"
+},
+{
+    id: 33,
+    name: "Golpark Sarbojanin Kali Puja",
+    address: "Golpark, Rashbehari Avenue, Kolkata - 700029",
+    timing: "6:00 AM – 11:00 PM",
+    description: "A peaceful yet vibrant puja in a South Kolkata residential hub. Popular among families and senior citizens for its calm atmosphere and traditional rituals.",
+    latitude: 22.5120,
+    longitude: 88.3600,
+    specialFeature: "Family-Oriented Traditional Puja",
+    area: "Golpark",
+    keyInfo: "Tranquil celebration in a quiet South Kolkata neighborhood",
+    crowdLevel: "Moderate",
+    category: "Residential Community"
+},
+{
+    id: 34,
+    name: "Sealdah Station Road Kali Puja",
+    address: "Station Road, Near Sealdah, Kolkata - 700010",
+    timing: "5:30 AM – 12:30 AM",
+    description: "One of the busiest pujas near Sealdah Railway Station, attracting commuters, travelers, and locals alike. Known for its round-the-clock accessibility and grand lighting.",
+    latitude: 22.5730,
+    longitude: 88.3700,
+    specialFeature: "24-Hour Accessibility Near Railway Hub",
+    area: "Sealdah",
+    keyInfo: "High-footfall puja near major transit point",
+    crowdLevel: "Very High",
+    category: "Urban Transit Celebration"
+},
+{
+    id: 35,
+    name: "Alipore Zoo Gate Kali Puja",
+    address: "Near Alipore Zoo Main Gate, Alipore, Kolkata - 700027",
+    timing: "6:00 AM – 11:00 PM",
+    description: "A charming community puja in the upscale Alipore area. The pandal often features nature-inspired themes, complementing its proximity to the zoo and botanical gardens.",
+    latitude: 22.5250,
+    longitude: 88.3250,
+    specialFeature: "Nature-Themed Near Botanical Gardens",
+    area: "Alipore",
+    keyInfo: "Elegant, green-themed celebration in heritage Alipore",
+    crowdLevel: "Moderate",
+    category: "Nature & Heritage"
+},
+{
+    id: 36,
+    name: "Khidirpur Sarbojanin Kali Puja",
+    address: "Khidirpur Main Road, Near Port Trust, Kolkata - 700023",
+    timing: "6:00 AM – 11:00 PM",
+    description: "A historic puja in the port area of Kolkata, reflecting the multicultural spirit of Khidirpur. Known for its inclusive atmosphere and maritime-themed decorations in recent years.",
+    latitude: 22.5400,
+    longitude: 88.3300,
+    specialFeature: "Multicultural Port-Area Celebration",
+    area: "Khidirpur",
+    keyInfo: "Diverse community celebration with maritime heritage",
+    crowdLevel: "High",
+    category: "Cultural Diversity"
+},
+{
+    id: 37,
+    name: "Paddapukur Sarbojanin Kali Puja",
+    address: "Paddapukur Road, Bhowanipore, Kolkata - 700025",
+    timing: "6:00 AM – 11:00 PM",
+    description: "A neighborhood favorite in South Kolkata, known for its intimate setting and heartfelt rituals. The pandal is modest but beautifully adorned with handcrafted decorations.",
+    latitude: 22.5170,
+    longitude: 88.3480,
+    specialFeature: "Intimate Neighborhood Puja",
+    area: "Paddapukur",
+    keyInfo: "Heartfelt, small-scale celebration with artisanal decor",
+    crowdLevel: "Moderate",
+    category: "Traditional Community"
+},
+{
+    id: 38,
+    name: "Metiabruz Princep Ghat Kali Puja",
+    address: "Metiabruz, Near Princep Ghat Extension, Kolkata - 700024",
+    timing: "6:00 AM – 11:00 PM",
+    description: "Celebrated in the culturally rich Metiabruz area, this puja reflects the syncretic traditions of Kolkata. Often features Indo-Islamic artistic motifs alongside traditional Kali imagery.",
+    latitude: 22.5450,
+    longitude: 88.3400,
+    specialFeature: "Syncretic Cultural Heritage",
+    area: "Metiabruz",
+    keyInfo: "Unique blend of Bengali and Indo-Islamic artistic traditions",
+    crowdLevel: "High",
+    category: "Syncretic Heritage"
+},
+{
+    id: 39,
+    name: "Sarsuna Satellite Township Kali Puja",
+    address: "Sarsuna Satellite Township, Behala, Kolkata - 700108",
+    timing: "6:00 AM – 10:30 PM",
+    description: "A growing community puja in the western suburbs, known for its family-friendly environment and modern yet respectful approach to rituals. Popular among young families.",
+    latitude: 22.4800,
+    longitude: 88.3000,
+    specialFeature: "Modern Suburban Family Puja",
+    area: "Sarsuna",
+    keyInfo: "Contemporary celebration in emerging western Kolkata",
+    crowdLevel: "Moderate",
+    category: "Modern Community"
+},
+{
+id: 40,
+name: "Maddox Square Kali Puja",
+address: "Maddox Square, Ballygunge, Kolkata - 700019",
+timing: "6:00 AM – 11:00 PM",
+description: "A prestigious puja in one of Kolkata's upscale parks, known for its elegant decorations and celebrity visitors. The open-air setting creates a unique festive atmosphere.",
+latitude: 22.5270,
+longitude: 88.3660,
+specialFeature: "Upscale Park Celebration",
+area: "Ballygunge",
+keyInfo: "Elegant open-air puja attracting elite crowd",
+crowdLevel: "High",
+category: "Park & Elite"
+},
+{
+id: 41,
+name: "Bosepukur Sitala Mandir Kali Puja",
+address: "Bosepukur Road, Kasba, Kolkata - 700042",
+timing: "6:00 AM – 12:00 AM",
+description: "Associated with the historic Sitala Mandir, this puja features traditional rituals and attracts devotees for its spiritual significance and community events.",
+latitude: 22.5150,
+longitude: 88.3850,
+specialFeature: "Temple-Associated Traditional Puja",
+area: "Kasba",
+keyInfo: "Spiritual rituals at historic temple complex",
+crowdLevel: "Very High",
+category: "Temple Heritage"
+},
+{
+id: 42,
+name: "Behala Nutan Dal Kali Puja",
+address: "Behala Chowrasta, Behala, Kolkata - 700034",
+timing: "6:00 AM – 11:00 PM",
+description: "Known for its innovative lighting and thematic pandals, this puja is a major draw in South Kolkata with cultural performances and food stalls.",
+latitude: 22.4950,
+longitude: 88.3150,
+specialFeature: "Innovative Lighting & Themes",
+area: "Behala",
+keyInfo: "Vibrant puja with cultural shows in Behala",
+crowdLevel: "Very High",
+category: "Thematic & Cultural"
+},
+{
+id: 43,
+name: "Salt Lake FD Block Kali Puja",
+address: "FD Block, Salt Lake, Kolkata - 700091",
+timing: "6:00 AM – 11:00 PM",
+description: "A modern suburban puja in Salt Lake, featuring contemporary designs and family-oriented activities in a planned township setting.",
+latitude: 22.5850,
+longitude: 88.4200,
+specialFeature: "Suburban Modern Celebration",
+area: "Salt Lake",
+keyInfo: "Contemporary puja in planned residential area",
+crowdLevel: "Moderate",
+category: "Modern Suburban"
+},
+{
+id: 44,
+name: "Baruipur Sarbojanin Kali Puja",
+address: "Baruipur Station Road, Baruipur, Kolkata - 700144",
+timing: "6:00 AM – 10:30 PM",
+description: "A grand community puja in the southern outskirts, known for its massive idol and traditional Bengali festivities with local artisan work.",
+latitude: 22.3600,
+longitude: 88.4300,
+specialFeature: "Grand Suburban Puja",
+area: "Baruipur",
+keyInfo: "Massive idol and traditional celebrations",
+crowdLevel: "High",
+category: "Suburban Community"
+},
+{
+id: 45,
+name: "Hatibagan Sarbojanin Kali Puja",
+address: "Hatibagan Market, Shyambazar, Kolkata - 700004",
+timing: "6:00 AM – 11:00 PM",
+description: "Located in the bustling market area, this puja combines shopping vibes with spiritual celebrations, featuring elaborate decorations.",
+latitude: 22.6000,
+longitude: 88.3700,
+specialFeature: "Market Area Festivity",
+area: "Hatibagan",
+keyInfo: "Spiritual puja amid bustling market atmosphere",
+crowdLevel: "Very High",
+category: "Urban Market"
+},
+{
+id: 46,
+name: "Thakurpukur Sarbojanin Kali Puja",
+address: "Thakurpukur Bazar, Thakurpukur, Kolkata - 700063",
+timing: "6:00 AM – 11:00 PM",
+description: "A traditional puja in South Kolkata's outskirts, known for its community participation and authentic rituals passed down generations.",
+latitude: 22.4600,
+longitude: 88.3100,
+specialFeature: "Traditional Outskirts Puja",
+area: "Thakurpukur",
+keyInfo: "Authentic rituals in a community setting",
+crowdLevel: "High",
+category: "Traditional Community"
+},
+{
+id: 47,
+name: "Kestopur Baguiati Kali Puja",
+address: "Baguiati Main Road, Kestopur, Kolkata - 700059",
+timing: "6:00 AM – 11:00 PM",
+description: "A growing puja in the northern suburbs, featuring modern themes and attracting young crowds with music and dance programs.",
+latitude: 22.6100,
+longitude: 88.4300,
+specialFeature: "Youth-Oriented Suburban Puja",
+area: "Kestopur",
+keyInfo: "Modern themes with entertainment programs",
+crowdLevel: "High",
+category: "Youth & Modern"
+},
+{
+id: 48,
+name: "Kalighat Temple Kali Puja",
+address: "Kalighat Temple Complex, Kalighat, Kolkata - 700026",
+timing: "5:00 AM – 10:00 PM",
+description: "The epicenter of Kali worship in Kolkata, this temple hosts massive celebrations with thousands of devotees offering prayers.",
+latitude: 22.5200,
+longitude: 88.3400,
+specialFeature: "Sacred Temple Puja",
+area: "Kalighat",
+keyInfo: "Main Kali Puja at historic Kalighat Temple",
+crowdLevel: "Very High",
+category: "Temple Pilgrimage"
+},
+{
+id: 49,
+name: "Bhowanipore 75 Palli Kali Puja",
+address: "75 Palli, Bhowanipore, Kolkata - 700025",
+timing: "6:00 AM – 11:00 PM",
+description: "A community-driven puja in a residential lane, known for its artistic pandal and neighborhood participation in cultural events.",
+latitude: 22.5300,
+longitude: 88.3500,
+specialFeature: "Residential Lane Celebration",
+area: "Bhowanipore",
+keyInfo: "Artistic pandal with local cultural events",
+crowdLevel: "Moderate",
+category: "Residential Artistic"
+}
+];
+
+        let map;
+        let markers = [];
+        let filteredPandals = [...pandalData];
+        let mapVisible = false;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                displayPandals(pandalData);
+                addFestiveAnimations();
+            }, 1500);
+            
+            // Add enter key listener for search
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchPandals();
+                }
+            });
+        });
+
+        // Display pandals in grid
+        function displayPandals(pandals) {
+            const grid = document.getElementById('pandalGrid');
+            const noResults = document.getElementById('noResults');
+            
+            if (pandals.length === 0) {
+                grid.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            grid.innerHTML = pandals.map(pandal => `
+                <div class="pandal-card">
+                    <div class="pandal-name">
+                        <i class="fas fa-landmark"></i> ${pandal.name}
+                    </div>
+                    <div class="pandal-address">
+                        <i class="fas fa-map-marker-alt"></i> ${pandal.address}
+                    </div>
+                    <div class="pandal-timing">
+                        <i class="fas fa-clock"></i> ${pandal.timing}
+                    </div>
+                    ${pandal.category ? `<div class="pandal-category">🏛️ ${pandal.category}</div>` : ''}
+                    ${pandal.crowdLevel ? `<div class="crowd-level crowd-${pandal.crowdLevel.toLowerCase().replace(/\s+/g, '-')}">👥 Crowd Level: ${pandal.crowdLevel}</div>` : ''}
+                    <div class="pandal-description">${pandal.description}</div>
+                    ${pandal.keyInfo ? `<div class="key-info">💡 <strong>Key Info:</strong> ${pandal.keyInfo}</div>` : ''}
+                    <div class="pandal-actions">
+                        <button class="btn btn-map" onclick="showOnMap(${pandal.latitude}, ${pandal.longitude}, '${pandal.name.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-map-marked-alt"></i> View on Map
+                        </button>
+                        <button class="btn btn-google-map" onclick="openInGoogleMaps('${pandal.address.replace(/'/g, "\\'")}', '${pandal.name.replace(/'/g, "\\'")}')">
+                            <i class="fab fa-google"></i> View on Google Maps
+                        </button>
+                    </div>
+                    <div class="special-feature">✨ ${pandal.specialFeature}</div>
+                </div>
+            `).join('');
+            
+            // Add fade-in animation to cards
+            setTimeout(() => {
+                addFestiveAnimations();
+            }, 100);
+        }
+
+        // Search functionality
+        function searchPandals() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                filteredPandals = [...pandalData];
+            } else {
+                filteredPandals = pandalData.filter(pandal =>
+                    pandal.name.toLowerCase().includes(searchTerm) ||
+                    pandal.address.toLowerCase().includes(searchTerm) ||
+                    pandal.description.toLowerCase().includes(searchTerm) ||
+                    pandal.area.toLowerCase().includes(searchTerm) ||
+                    pandal.specialFeature.toLowerCase().includes(searchTerm) ||
+                    (pandal.category && pandal.category.toLowerCase().includes(searchTerm)) ||
+                    (pandal.keyInfo && pandal.keyInfo.toLowerCase().includes(searchTerm)) ||
+                    (pandal.crowdLevel && pandal.crowdLevel.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            displayPandals(filteredPandals);
+            
+            if (mapVisible) {
+                updateMapMarkers();
+            }
+        }
+
+        // Toggle map visibility
+        function toggleMap() {
+            const mapContainer = document.getElementById('mapContainer');
+            const toggleBtn = document.getElementById('mapToggleBtn');
+            
+            if (!mapVisible) {
+                mapContainer.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Hide Map';
+                mapVisible = true;
+                
+                if (!map) {
+                    initializeMap();
+                }
+                
+                setTimeout(() => {
+                    if (map) {
+                        map.invalidateSize();
+                        updateMapMarkers();
+                    }
+                }, 100);
+            } else {
+                mapContainer.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Show Map';
+                mapVisible = false;
+            }
+        }
+
+        // Initialize map
+        function initializeMap() {
+            map = L.map('map').setView([22.5726, 88.3639], 11);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // Update map markers
+        function updateMapMarkers() {
+            if (!map) return;
+            
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            // Add markers for filtered pandals
+            filteredPandals.forEach(pandal => {
+                const marker = L.marker([pandal.latitude, pandal.longitude])
+                    .addTo(map)
+                    .bindPopup(`
+                        <div style="max-width: 220px;">
+                            <h4>${pandal.name}</h4>
+                            <p><i class="fas fa-map-marker-alt"></i> ${pandal.address}</p>
+                            <p><i class="fas fa-clock"></i> ${pandal.timing}</p>
+                            <p>${pandal.description.substring(0, 100)}...</p>
+                            <span style="background: linear-gradient(45deg, #ffd700, #ffed4e); color: #8B0000; padding: 3px 8px; border-radius: 12px; font-size: 12px; display: inline-block; margin-top: 5px;">✨ ${pandal.specialFeature}</span>
+                        </div>
+                    `);
+                
+                markers.push(marker);
+            });
+            
+            // Fit map to show all markers
+            if (markers.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        // Show specific location on map
+        function showOnMap(lat, lng, name) {
+            if (!mapVisible) {
+                toggleMap();
+            }
+            
+            setTimeout(() => {
+                if (map) {
+                    map.setView([lat, lng], 16);
+                    
+                    // Find and open popup for this location
+                    markers.forEach(marker => {
+                        const markerLatLng = marker.getLatLng();
+                        if (Math.abs(markerLatLng.lat - lat) < 0.001 && Math.abs(markerLatLng.lng - lng) < 0.001) {
+                            marker.openPopup();
+                        }
+                    });
+                    
+                    // Scroll to map
+                    document.getElementById('mapContainer').scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }, 300);
+        }
+
+        // Open in Google Maps with address
+        function openInGoogleMaps(address, name) {
+            // Encode the address for URL
+            const encodedAddress = encodeURIComponent(address);
+            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+            
+            // Open in new tab
+            window.open(googleMapsUrl, '_blank');
+            
+            // Optional: Log for debugging
+            console.log('Opening Google Maps for:', address);
+        }
+
+        // Add festive animations
+        function addFestiveAnimations() {
+            const cards = document.querySelectorAll('.pandal-card');
+            cards.forEach((card, index) => {
+                card.style.animation = `fadeInUp 0.6s ease forwards`;
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.style.opacity = '0';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, index * 100);
+            });
+        }
+    </script>
+</body>
+</html>
